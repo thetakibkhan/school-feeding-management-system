@@ -33,7 +33,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin/schools')->name('admin.
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin/demand-setup')->name('admin.demand-setup.')->group(function (): void {
     Route::get('/', [DemandSetupController::class, 'index'])->name('index');
-    Route::post('/rations', [DemandSetupController::class, 'storeRation'])->name('rations.store');
+    Route::put('/items/{foodItem}/specification', [DemandSetupController::class, 'updateItemSpecification'])->name('items.specification.update');
     Route::post('/schedules', [DemandSetupController::class, 'storeSchedule'])->name('schedules.store');
     Route::put('/schedules/{schedule}', [DemandSetupController::class, 'updateSchedule'])->name('schedules.update');
     Route::delete('/schedules/{schedule}', [DemandSetupController::class, 'destroySchedule'])->name('schedules.destroy');

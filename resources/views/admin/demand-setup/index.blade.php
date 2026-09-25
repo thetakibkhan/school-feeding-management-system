@@ -13,7 +13,7 @@
                 <div>
                     <p class="dashboard-eyebrow">Administration</p>
                     <h2>Demand setup</h2>
-                    <p>Manage rations, non-working dates, and daily Bun, Egg, and Banana schedules.</p>
+                    <p>Manage item specifications, non-working dates, and date-wise Bun, Egg, and Banana schedules.</p>
                 </div>
             </div>
 
@@ -29,16 +29,9 @@
 
             <div class="demand-setup__grid">
                 <section class="editable-table-card demand-setup__card">
-                    <div class="school-detail-card__heading"><div><p class="dashboard-eyebrow">Item specification</p><h3>Ration history</h3></div></div>
+                    <div class="school-detail-card__heading"><div><p class="dashboard-eyebrow">Item specification</p><h3>Unit weights</h3><p>Weights describe each item; they do not multiply daily demand.</p></div></div>
                     <div class="demand-setup__body">
-                        <form class="demand-setup__form" method="POST" action="{{ route('admin.demand-setup.rations.store') }}">
-                            @csrf
-                            <label>Food item <select name="food_item_id" required><option value="">Choose item</option>@foreach ($foodItems as $foodItem)<option value="{{ $foodItem->id }}" @selected(old('food_item_id') == $foodItem->id)>{{ $foodItem->name }}</option>@endforeach</select></label>
-                            <label>Ration (grams) <input type="number" min="1" name="ration_grams" value="{{ old('ration_grams') }}" required></label>
-                            <label>Effective start date <input type="date" name="effective_start_date" value="{{ old('effective_start_date') }}" required></label>
-                            <button class="user-management__primary-action" type="submit">Add ration record</button>
-                        </form>
-                        <table class="editable-table demand-setup__table"><thead><tr><th>Item</th><th>Grams</th><th>Effective from</th></tr></thead><tbody>@foreach ($rationSettings as $setting)<tr><td>{{ $setting->foodItem->name }}</td><td>{{ $setting->ration_grams }}g</td><td>{{ $setting->effective_start_date->format('d M Y') }}</td></tr>@endforeach</tbody></table>
+                        <table class="editable-table demand-setup__table"><thead><tr><th>Food item</th><th>Unit weight (grams)</th><th>Demand unit</th><th>Action</th></tr></thead><tbody>@foreach ($foodItems as $foodItem)<tr><td>{{ $foodItem->name }}</td><td><form class="demand-setup__spec-form" method="POST" action="{{ route('admin.demand-setup.items.specification.update', $foodItem) }}">@csrf @method('PUT')<input type="number" min="1" name="unit_weight_grams" value="{{ $foodItem->unit_weight_grams }}" aria-label="{{ $foodItem->name }} unit weight in grams" required><button type="submit">Save</button></form></td><td>{{ $foodItem->unit }}</td><td>Specification only</td></tr>@endforeach</tbody></table>
                     </div>
                 </section>
 

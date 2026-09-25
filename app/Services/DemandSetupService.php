@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Exceptions\DemandSetupChangeBlocked;
 use App\Models\FoodSchedule;
 use App\Models\NonWorkingDate;
-use App\Models\RationSetting;
+use App\Models\FoodItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
@@ -72,13 +72,9 @@ class DemandSetupService
         $nonWorkingDate->delete();
     }
 
-    public function addRationSetting(int $foodItemId, int $rationGrams, string $effectiveStartDate): RationSetting
+    public function updateItemSpecification(FoodItem $foodItem, int $unitWeightGrams): void
     {
-        return RationSetting::query()->create([
-            'food_item_id' => $foodItemId,
-            'ration_grams' => $rationGrams,
-            'effective_start_date' => $effectiveStartDate,
-        ]);
+        $foodItem->update(['unit_weight_grams' => $unitWeightGrams]);
     }
 
     private function ensureNoActiveSchedule(string $date): void

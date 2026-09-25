@@ -6,11 +6,10 @@ use App\Exceptions\DemandSetupChangeBlocked;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreFoodScheduleRequest;
 use App\Http\Requests\StoreNonWorkingDateRequest;
-use App\Http\Requests\StoreRationSettingRequest;
+use App\Http\Requests\StoreFoodItemSpecificationRequest;
 use App\Models\FoodItem;
 use App\Models\FoodSchedule;
 use App\Models\NonWorkingDate;
-use App\Models\RationSetting;
 use App\Services\DemandSetupService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,11 +26,6 @@ class DemandSetupController extends Controller
 
         return view('admin.demand-setup.index', [
             'foodItems' => FoodItem::query()->orderBy('id')->get(),
-            'rationSettings' => RationSetting::query()
-                ->with('foodItem')
-                ->orderByDesc('effective_start_date')
-                ->orderBy('food_item_id')
-                ->get(),
             'schedules' => FoodSchedule::query()
                 ->with('items')
                 ->when($from, fn ($query, string $date) => $query->whereDate('date', '>=', $date))
@@ -48,16 +42,12 @@ class DemandSetupController extends Controller
         ]);
     }
 
-    public function storeRation(StoreRationSettingRequest $request): RedirectResponse
+    public function updateItemSpecification(StoreFoodItemSpecificationRequest $request, FoodItem $foodItem): RedirectResponse
     {
         $data = $request->validated();
-        $this->demandSetup->addRationSetting(
-            $data['food_item_id'],
-            $data['ration_grams'],
-            $data['effective_start_date'],
-        );
+        $this->demandSetup->updateItemSpecification($foodItem, $data['unit_weight_grams']);
 
-        return to_route('admin.demand-setup.index')->with('status', 'Ration setting added.');
+        return to_route('admin.demand-setup.index')->with('status', 'Item specification updated.');
     }
 
     public function storeSchedule(StoreFoodScheduleRequest $request): RedirectResponse

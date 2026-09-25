@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\FoodItem;
 use App\Models\FoodSchedule;
 use App\Models\NonWorkingDate;
-use App\Models\RationSetting;
 use App\Models\School;
 
 class DemandCalculator
@@ -19,16 +18,14 @@ class DemandCalculator
         }
 
         $studentCount = $this->studentCounts->forDate($school, $date);
-        $rationSetting = $this->rationForDate($foodItem, $date);
-
-        if ($studentCount === null || $rationSetting === null) {
-            return new DemandCalculation(0, $studentCount, $rationSetting?->ration_grams);
+        if ($studentCount === null) {
+            return new DemandCalculation(0, null, $foodItem->unit_weight_grams);
         }
 
         return new DemandCalculation(
             (int) round($studentCount * 0.90),
             $studentCount,
-            $rationSetting->ration_grams,
+            $foodItem->unit_weight_grams,
         );
     }
 
@@ -43,14 +40,5 @@ class DemandCalculator
             ->whereDate('date', $date)
             ->whereHas('items', fn ($query) => $query->whereKey($foodItem->id))
             ->exists();
-    }
-
-    private function rationForDate(FoodItem $foodItem, string $date): ?RationSetting
-    {
-        return RationSetting::query()
-            ->whereBelongsTo($foodItem)
-            ->whereDate('effective_start_date', '<=', $date)
-            ->orderByDesc('effective_start_date')
-            ->first();
     }
 }

@@ -42,6 +42,8 @@ class DemandSetupTest extends TestCase
         $this->seed(DemandSetupSeeder::class);
         $school = $this->schoolWithCount(101, '2026-09-01');
         $bun = FoodItem::query()->where('key', 'bun')->firstOrFail();
+        $oldDateSchedule = FoodSchedule::query()->create(['date' => '2026-09-14']);
+        $oldDateSchedule->items()->sync([$bun->id]);
         $schedule = FoodSchedule::query()->create(['date' => '2026-10-01']);
         $schedule->items()->sync([$bun->id]);
         SchoolStudentCount::query()->create([
@@ -52,8 +54,10 @@ class DemandSetupTest extends TestCase
 
         $calculator = app(DemandCalculator::class);
 
+        $beforeStudentCountChange = $calculator->forSchoolDateItem($school, '2026-09-14', $bun);
         $result = $calculator->forSchoolDateItem($school, '2026-10-01', $bun);
 
+        $this->assertSame(91, $beforeStudentCountChange->quantity);
         $this->assertSame(108, $result->quantity);
         $this->assertSame(120, $result->studentCount);
         $this->assertSame(120, $result->unitWeightGrams);
@@ -115,6 +119,47 @@ class DemandSetupTest extends TestCase
 
         $response->assertRedirect('/admin/demand-setup');
         $response->assertSessionHasErrors('food_item_ids');
+    }
+
+    public function test_admin_can_configure_real_calendar_dates_and_edit_unit_weight(): void
+    {
+        $this->seed(DemandSetupSeeder::class);
+        $admin = $this->admin();
+        $bun = FoodItem::query()->where('key', 'bun')->firstOrFail();
+        $banana = FoodItem::query()->where('key', 'banana')->firstOrFail();
+
+        $this->actingAs($admin)
+            ->post('/admin/demand-setup/schedules', [
+                'date' => '2026-10-05',
+                'food_item_ids' => [$banana->id],
+            ])
+            ->assertRedirect('/admin/demand-setup');
+
+        $this->assertDatabaseHas('food_schedules', ['date' => '2026-10-05 00:00:00']);
+        $this->assertDatabaseHas('food_schedule_items', [
+            'food_schedule_id' => FoodSchedule::query()->whereDate('date', '2026-10-05')->value('id'),
+            'food_item_id' => $banana->id,
+        ]);
+
+        $this->actingAs($admin)
+            ->put('/admin/demand-setup/items/'.$bun->id.'/specification', [
+                'unit_weight_grams' => 125,
+            ])
+            ->assertRedirect('/admin/demand-setup');
+
+        $this->assertDatabaseHas('food_items', [
+            'id' => $bun->id,
+            'unit_weight_grams' => 125,
+        ]);
+
+        $bun->refresh();
+        $school = $this->schoolWithCount(100, '2026-09-01');
+        $bunSchedule = FoodSchedule::query()->create(['date' => '2026-10-06']);
+        $bunSchedule->items()->sync([$bun->id]);
+        $demand = app(DemandCalculator::class)->forSchoolDateItem($school, '2026-10-06', $bun);
+
+        $this->assertSame(90, $demand->quantity);
+        $this->assertSame(125, $demand->unitWeightGrams);
     }
 
     public function test_schedule_and_non_working_date_changes_are_blocked_after_delivery_exists(): void

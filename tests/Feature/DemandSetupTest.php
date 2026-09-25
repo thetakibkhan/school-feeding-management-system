@@ -143,6 +143,26 @@ class DemandSetupTest extends TestCase
             'updated_at' => now(),
         ]);
 
+        $banana = FoodItem::query()->where('key', 'banana')->firstOrFail();
+
+        $this->actingAs($this->admin())
+            ->from('/admin/demand-setup')
+            ->put('/admin/demand-setup/schedules/'.$schedule->id, [
+                'date' => '2026-09-01',
+                'food_item_ids' => [$banana->id],
+            ])
+            ->assertRedirect('/admin/demand-setup')
+            ->assertSessionHas('error');
+
+        $this->actingAs($this->admin())
+            ->from('/admin/demand-setup')
+            ->put('/admin/demand-setup/non-working-dates/'.$holiday->id, [
+                'date' => '2026-09-22',
+                'reason' => 'Updated reason',
+            ])
+            ->assertRedirect('/admin/demand-setup')
+            ->assertSessionHas('error');
+
         $this->actingAs($this->admin())
             ->from('/admin/demand-setup')
             ->delete('/admin/demand-setup/schedules/'.$schedule->id)

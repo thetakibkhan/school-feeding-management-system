@@ -19,14 +19,14 @@
             <div class="dashboard-sidebar__label" data-sidebar-label>Workspaces</div>
             <a class="dashboard-nav-item {{ $active === 'Dashboard' ? 'is-active' : '' }}" href="{{ route('dashboard') }}" title="Dashboard"><span aria-hidden="true">⌂</span><span data-sidebar-label>Dashboard</span></a>
             @if (auth()->user()->isAdmin())
-                @php($administrationActive = in_array($active, ['Users', 'Schools'], true))
+                @php($administrationActive = in_array($active, ['Users', 'Schools', 'Demand setup'], true))
                 <button class="dashboard-nav-item dashboard-nav-item--expandable {{ $administrationActive ? 'is-active' : '' }}" type="button" data-sidebar-section="Administration" aria-expanded="{{ $administrationActive ? 'true' : 'false' }}" title="Administration">
                     <span aria-hidden="true">⚙</span><span data-sidebar-label>Administration</span><span class="dashboard-nav-chevron" data-sidebar-label>›</span>
                 </button>
                 <div class="dashboard-submenu {{ $administrationActive ? 'is-open' : '' }}" data-sidebar-submenu="Administration">
                     <a href="{{ route('admin.users.index') }}" class="dashboard-submenu__item {{ $active === 'Users' ? 'is-active' : '' }}">Users</a>
                     <a href="{{ route('admin.schools.index') }}" class="dashboard-submenu__item {{ $active === 'Schools' ? 'is-active' : '' }}">Schools</a>
-                    <a href="{{ route('admin.dashboard') }}" class="dashboard-submenu__item">Setup</a>
+                    <a href="{{ route('admin.demand-setup.index') }}" class="dashboard-submenu__item {{ $active === 'Demand setup' ? 'is-active' : '' }}">Demand setup</a>
                 </div>
             @endif
             <button class="dashboard-nav-item dashboard-nav-item--expandable" type="button" data-sidebar-section="Operations" aria-expanded="false" title="Operations">

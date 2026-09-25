@@ -35,5 +35,8 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ],
         );
+
+        $this->call(AnwaraSchoolSeeder::class);
+        $this->call(DemandSetupSeeder::class);
     }
 }

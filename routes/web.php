@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\DemandSetupController;
 use App\Http\Controllers\Admin\SchoolManagementController;
+use App\Http\Controllers\Admin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/dashboard', 'dashboard')
@@ -28,6 +29,17 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin/schools')->name('admin.
     Route::put('/{school}', [SchoolManagementController::class, 'update'])->name('update');
     Route::post('/{school}/student-counts', [SchoolManagementController::class, 'storeStudentCount'])->name('student-counts.store');
     Route::delete('/{school}', [SchoolManagementController::class, 'destroy'])->name('destroy');
+});
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin/demand-setup')->name('admin.demand-setup.')->group(function (): void {
+    Route::get('/', [DemandSetupController::class, 'index'])->name('index');
+    Route::post('/rations', [DemandSetupController::class, 'storeRation'])->name('rations.store');
+    Route::post('/schedules', [DemandSetupController::class, 'storeSchedule'])->name('schedules.store');
+    Route::put('/schedules/{schedule}', [DemandSetupController::class, 'updateSchedule'])->name('schedules.update');
+    Route::delete('/schedules/{schedule}', [DemandSetupController::class, 'destroySchedule'])->name('schedules.destroy');
+    Route::post('/non-working-dates', [DemandSetupController::class, 'storeNonWorkingDate'])->name('non-working-dates.store');
+    Route::put('/non-working-dates/{nonWorkingDate}', [DemandSetupController::class, 'updateNonWorkingDate'])->name('non-working-dates.update');
+    Route::delete('/non-working-dates/{nonWorkingDate}', [DemandSetupController::class, 'destroyNonWorkingDate'])->name('non-working-dates.destroy');
 });
 
 Route::get('/', function () {

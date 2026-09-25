@@ -1,5 +1,5 @@
 :root { --dashboard-ink: #172033; --dashboard-muted: #64748b; --dashboard-line: #e5e7eb; --dashboard-surface: #fff; --dashboard-bg: #f8fafc; --dashboard-accent: #2563eb; }
-.app-shell { position: relative; min-height: 100vh; overflow: hidden; }
+.app-shell { position: relative; min-height: 100vh; overflow: hidden; background: #050608; }
 .app-shell__background { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 .app-shell__background > .beams-background { min-height: 100%; }
 .app-shell__content { position: relative; z-index: 1; }

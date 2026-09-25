@@ -8,8 +8,8 @@ function createBeam(width, height) {
         length: height * 2.5,
         angle: -35 + Math.random() * 10,
         speed: 0.6 + Math.random() * 1.2,
-        opacity: 0.12 + Math.random() * 0.16,
-        hue: 190 + Math.random() * 70,
+        opacity: 0.12 + Math.random() * 0.08,
+        hue: 218 + Math.random() * 18,
         pulse: Math.random() * Math.PI * 2,
         pulseSpeed: 0.02 + Math.random() * 0.03,
     };
@@ -21,7 +21,7 @@ function drawBeam(context, beam, intensity) {
     context.rotate((beam.angle * Math.PI) / 180);
 
     const opacity = beam.opacity * (0.8 + Math.sin(beam.pulse) * 0.2) * intensityOpacity[intensity];
-    const color = (alpha) => `hsla(${beam.hue}, 85%, 65%, ${alpha})`;
+    const color = (alpha) => `hsla(${beam.hue}, 18%, 24%, ${alpha})`;
     const gradient = context.createLinearGradient(0, 0, 0, beam.length);
 
     gradient.addColorStop(0, color(0));
@@ -42,8 +42,8 @@ function resetBeam(beam, index, totalBeams, width, height) {
     beam.x = (index % 3) * spacing + spacing / 2 + (Math.random() - 0.5) * spacing * 0.5;
     beam.width = 100 + Math.random() * 100;
     beam.speed = 0.5 + Math.random() * 0.4;
-    beam.hue = 190 + (index * 70) / totalBeams;
-    beam.opacity = 0.2 + Math.random() * 0.1;
+    beam.hue = 218 + (index * 18) / totalBeams;
+    beam.opacity = 0.12 + Math.random() * 0.08;
 }
 
 export function mountBeamsBackground(element, intensity = 'strong') {

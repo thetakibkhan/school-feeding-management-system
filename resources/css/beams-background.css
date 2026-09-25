@@ -1,0 +1,7 @@
+.beams-background { position: relative; min-height: 100vh; width: 100%; overflow: hidden; background: #0a0f1f; }
+.beams-background canvas, .beams-background__veil { position: absolute; inset: 0; height: 100%; width: 100%; }
+.beams-background canvas { z-index: 0; filter: blur(15px); }
+.beams-background__veil { z-index: 1; background: rgba(10, 15, 31, 0.05); backdrop-filter: blur(50px); animation: beams-overlay-pulse 10s ease-in-out infinite; }
+.beams-background__content { position: relative; z-index: 2; display: flex; min-height: 100vh; width: 100%; align-items: center; justify-content: center; }
+@media (prefers-reduced-motion: reduce) { .beams-background canvas { display: none; } }
+@keyframes beams-overlay-pulse { 0%, 100% { opacity: 0.05; } 50% { opacity: 0.15; } }

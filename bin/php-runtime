@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PHP_ROOT="${PROTTYASHI_PHP_ROOT:-/tmp/prottyashi-php/root}"
+PHP_BIN="$PHP_ROOT/usr/bin/php8.3"
+EXT_DIR="$PHP_ROOT/usr/lib/php/20230831"
+
+exec env PHPRC="${PROTTYASHI_PHP_INI:-/tmp/prottyashi-php/php.ini}" \
+  LD_LIBRARY_PATH="$PHP_ROOT/usr/lib/x86_64-linux-gnu${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+  "$PHP_BIN" "$@"

@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\FoodItem;
+use App\Models\FoodSchedule;
+use App\Models\NonWorkingDate;
 use Illuminate\Database\Seeder;
 
 class DemandSetupSeeder extends Seeder
@@ -27,9 +29,41 @@ class DemandSetupSeeder extends Seeder
         'banana' => ['name' => 'Banana', 'unit' => 'pieces', 'unit_weight_grams' => 100],
     ];
 
+    /**
+     * Exact calendar dates and items transcribed from the September 2026
+     * Daily Demand PDF. Dates absent from this source are not inferred as
+     * holidays or working dates.
+     *
+     * @var array<string, array<int, string>>
+     */
+    private const SEPTEMBER_SCHEDULE = [
+        '2026-09-01' => ['banana'],
+        '2026-09-02' => ['bun', 'boiled_egg'],
+        '2026-09-03' => ['bun', 'boiled_egg'],
+        '2026-09-04' => ['bun', 'boiled_egg'],
+        '2026-09-06' => ['bun'],
+        '2026-09-07' => ['banana'],
+        '2026-09-08' => ['bun', 'boiled_egg'],
+        '2026-09-09' => ['bun', 'boiled_egg'],
+        '2026-09-10' => ['bun', 'boiled_egg'],
+        '2026-09-14' => ['bun'],
+        '2026-09-15' => ['banana'],
+        '2026-09-16' => ['bun', 'boiled_egg'],
+        '2026-09-17' => ['bun', 'boiled_egg'],
+        '2026-09-20' => ['bun', 'boiled_egg'],
+        '2026-09-21' => ['bun'],
+        '2026-09-22' => ['banana'],
+        '2026-09-23' => ['bun', 'boiled_egg'],
+        '2026-09-24' => ['bun', 'boiled_egg'],
+        '2026-09-27' => ['bun'],
+        '2026-09-29' => ['banana'],
+        '2026-09-30' => ['bun', 'boiled_egg'],
+    ];
+
     public function run(): void
     {
-        $this->seedFoodItems();
+        $itemsByKey = $this->seedFoodItems();
+        $this->seedSeptemberSchedules($itemsByKey);
     }
 
     /**
@@ -51,5 +85,24 @@ class DemandSetupSeeder extends Seeder
         }
 
         return $items;
+    }
+
+    /**
+     * @param  array<string, FoodItem>  $itemsByKey
+     */
+    private function seedSeptemberSchedules(array $itemsByKey): void
+    {
+        foreach (self::SEPTEMBER_SCHEDULE as $date => $itemKeys) {
+            if (FoodSchedule::query()->whereDate('date', $date)->exists()
+                || NonWorkingDate::query()->whereDate('date', $date)->exists()) {
+                continue;
+            }
+
+            $schedule = FoodSchedule::query()->create(['date' => $date]);
+            $schedule->items()->sync(array_map(
+                fn (string $itemKey): int => $itemsByKey[$itemKey]->id,
+                $itemKeys,
+            ));
+        }
     }
 }

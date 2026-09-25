@@ -21,7 +21,7 @@ class DemandSetupTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_demand_setup_seeds_item_weights_and_source_distribution_totals_without_calendar_dates(): void
+    public function test_demand_setup_seeds_exact_source_dates_and_item_totals_without_inferred_holidays(): void
     {
         $this->seed(DemandSetupSeeder::class);
 
@@ -33,8 +33,24 @@ class DemandSetupTest extends TestCase
             'boiled_egg' => 12,
             'banana' => 5,
         ], DemandSetupSeeder::SOURCE_DISTRIBUTION_DAY_TOTALS);
-        $this->assertSame(0, FoodSchedule::query()->count());
+        $this->assertSame(21, FoodSchedule::query()->count());
         $this->assertSame(0, NonWorkingDate::query()->count());
+        $this->assertSame(16, $this->scheduledDayCount('bun'));
+        $this->assertSame(12, $this->scheduledDayCount('boiled_egg'));
+        $this->assertSame(5, $this->scheduledDayCount('banana'));
+        $this->assertSame([
+            '2026-09-01', '2026-09-02', '2026-09-03', '2026-09-04', '2026-09-06',
+            '2026-09-07', '2026-09-08', '2026-09-09', '2026-09-10', '2026-09-14',
+            '2026-09-15', '2026-09-16', '2026-09-17', '2026-09-20', '2026-09-21',
+            '2026-09-22', '2026-09-23', '2026-09-24', '2026-09-27', '2026-09-29',
+            '2026-09-30',
+        ], FoodSchedule::query()->orderBy('date')->get()->map(
+            fn (FoodSchedule $schedule): string => $schedule->date->toDateString(),
+        )->all());
+        $this->assertSame(['banana'], FoodSchedule::query()->whereDate('date', '2026-09-22')->firstOrFail()->items()->pluck('key')->all());
+        $this->assertSame(['bun', 'boiled_egg'], FoodSchedule::query()->whereDate('date', '2026-09-30')->firstOrFail()->items()->orderBy('key')->pluck('key')->all());
+        $this->assertDatabaseMissing('food_schedules', ['date' => '2026-09-05 00:00:00']);
+        $this->assertDatabaseMissing('non_working_dates', ['date' => '2026-09-25 00:00:00']);
     }
 
     public function test_demand_uses_effective_students_and_unit_weight_is_metadata_only(): void
@@ -251,6 +267,13 @@ class DemandSetupTest extends TestCase
         ]);
 
         return $school;
+    }
+
+    private function scheduledDayCount(string $itemKey): int
+    {
+        return FoodSchedule::query()
+            ->whereHas('items', fn ($query) => $query->where('key', $itemKey))
+            ->count();
     }
 
     private function admin(): User

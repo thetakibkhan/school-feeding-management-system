@@ -6,7 +6,6 @@ use App\Enums\UserRole;
 use App\Models\FoodItem;
 use App\Models\FoodSchedule;
 use App\Models\NonWorkingDate;
-use App\Models\RationSetting;
 use App\Models\School;
 use App\Models\SchoolStudentCount;
 use App\Models\User;
@@ -22,42 +21,29 @@ class DemandSetupTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_demand_setup_seeds_initial_rations_and_exact_september_totals(): void
+    public function test_demand_setup_seeds_item_weights_and_source_distribution_totals_without_calendar_dates(): void
     {
         $this->seed(DemandSetupSeeder::class);
 
-        $this->assertDatabaseHas('ration_settings', [
-            'food_item_id' => FoodItem::query()->where('key', 'bun')->value('id'),
-            'ration_grams' => 120,
-            'effective_start_date' => '2026-09-01 00:00:00',
-        ]);
-        $this->assertDatabaseHas('ration_settings', [
-            'food_item_id' => FoodItem::query()->where('key', 'boiled_egg')->value('id'),
-            'ration_grams' => 60,
-        ]);
-        $this->assertDatabaseHas('ration_settings', [
-            'food_item_id' => FoodItem::query()->where('key', 'banana')->value('id'),
-            'ration_grams' => 100,
-        ]);
-
-        $this->assertSame(16, $this->scheduledDayCount('bun'));
-        $this->assertSame(12, $this->scheduledDayCount('boiled_egg'));
-        $this->assertSame(5, $this->scheduledDayCount('banana'));
-        $this->assertDatabaseHas('food_schedules', ['date' => '2026-09-04 00:00:00']);
-        $this->assertDatabaseHas('non_working_dates', ['date' => '2026-09-22 00:00:00']);
+        $this->assertSame(120, FoodItem::query()->where('key', 'bun')->value('unit_weight_grams'));
+        $this->assertSame(60, FoodItem::query()->where('key', 'boiled_egg')->value('unit_weight_grams'));
+        $this->assertSame(100, FoodItem::query()->where('key', 'banana')->value('unit_weight_grams'));
+        $this->assertSame([
+            'bun' => 16,
+            'boiled_egg' => 12,
+            'banana' => 5,
+        ], DemandSetupSeeder::SOURCE_DISTRIBUTION_DAY_TOTALS);
+        $this->assertSame(0, FoodSchedule::query()->count());
+        $this->assertSame(0, NonWorkingDate::query()->count());
     }
 
-    public function test_demand_uses_the_ration_and_student_count_effective_on_the_requested_date(): void
+    public function test_demand_uses_effective_students_and_unit_weight_is_metadata_only(): void
     {
         $this->seed(DemandSetupSeeder::class);
         $school = $this->schoolWithCount(101, '2026-09-01');
         $bun = FoodItem::query()->where('key', 'bun')->firstOrFail();
-
-        RationSetting::query()->create([
-            'food_item_id' => $bun->id,
-            'ration_grams' => 150,
-            'effective_start_date' => '2026-09-15',
-        ]);
+        $schedule = FoodSchedule::query()->create(['date' => '2026-10-01']);
+        $schedule->items()->sync([$bun->id]);
         SchoolStudentCount::query()->create([
             'school_id' => $school->id,
             'student_count' => 120,
@@ -66,35 +52,40 @@ class DemandSetupTest extends TestCase
 
         $calculator = app(DemandCalculator::class);
 
-        $beforeChange = $calculator->forSchoolDateItem($school, '2026-09-14', $bun);
-        $afterChange = $calculator->forSchoolDateItem($school, '2026-09-15', $bun);
+        $result = $calculator->forSchoolDateItem($school, '2026-10-01', $bun);
 
-        $this->assertSame(91, $beforeChange->quantity);
-        $this->assertSame(120, $beforeChange->rationGrams);
-        $this->assertSame(108, $afterChange->quantity);
-        $this->assertSame(150, $afterChange->rationGrams);
+        $this->assertSame(108, $result->quantity);
+        $this->assertSame(120, $result->studentCount);
+        $this->assertSame(120, $result->unitWeightGrams);
     }
 
     public function test_non_working_and_unscheduled_dates_have_zero_demand(): void
     {
         $this->seed(DemandSetupSeeder::class);
         $school = $this->schoolWithCount(100, '2026-09-01');
+        $banana = FoodItem::query()->where('key', 'banana')->firstOrFail();
+        $schedule = FoodSchedule::query()->create(['date' => '2026-10-01']);
+        $schedule->items()->sync([$banana->id]);
+        NonWorkingDate::query()->create([
+            'date' => '2026-10-02',
+            'reason' => 'Test non-working date',
+        ]);
         $calculator = app(DemandCalculator::class);
 
         $this->assertSame(0, $calculator->forSchoolDateItem(
             $school,
-            '2026-09-22',
+            '2026-10-02',
             FoodItem::query()->where('key', 'bun')->firstOrFail(),
         )->quantity);
         $this->assertSame(0, $calculator->forSchoolDateItem(
             $school,
-            '2026-09-01',
+            '2026-10-01',
             FoodItem::query()->where('key', 'bun')->firstOrFail(),
         )->quantity);
         $this->assertSame(90, $calculator->forSchoolDateItem(
             $school,
-            '2026-09-01',
-            FoodItem::query()->where('key', 'banana')->firstOrFail(),
+            '2026-10-01',
+            $banana,
         )->quantity);
     }
 
@@ -105,7 +96,7 @@ class DemandSetupTest extends TestCase
 
         $result = app(DemandCalculator::class)->forSchoolDateItem(
             $school,
-            '2026-09-01',
+            '2026-10-01',
             FoodItem::query()->where('key', 'banana')->firstOrFail(),
         );
 
@@ -129,16 +120,20 @@ class DemandSetupTest extends TestCase
     public function test_schedule_and_non_working_date_changes_are_blocked_after_delivery_exists(): void
     {
         $this->seed(DemandSetupSeeder::class);
-        $schedule = FoodSchedule::query()->whereDate('date', '2026-09-01')->firstOrFail();
-        $holiday = NonWorkingDate::query()->whereDate('date', '2026-09-22')->firstOrFail();
+        $schedule = FoodSchedule::query()->create(['date' => '2026-10-01']);
+        $schedule->items()->sync([FoodItem::query()->where('key', 'bun')->value('id')]);
+        $holiday = NonWorkingDate::query()->create([
+            'date' => '2026-10-02',
+            'reason' => 'Test non-working date',
+        ]);
         $this->createDeliveryTable();
         DB::table('deliveries')->insert([
-            'date' => '2026-09-01',
+            'date' => '2026-10-01',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
         DB::table('deliveries')->insert([
-            'date' => '2026-09-22',
+            'date' => '2026-10-02',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -148,7 +143,7 @@ class DemandSetupTest extends TestCase
         $this->actingAs($this->admin())
             ->from('/admin/demand-setup')
             ->put('/admin/demand-setup/schedules/'.$schedule->id, [
-                'date' => '2026-09-01',
+                'date' => '2026-10-01',
                 'food_item_ids' => [$banana->id],
             ])
             ->assertRedirect('/admin/demand-setup')
@@ -157,7 +152,7 @@ class DemandSetupTest extends TestCase
         $this->actingAs($this->admin())
             ->from('/admin/demand-setup')
             ->put('/admin/demand-setup/non-working-dates/'.$holiday->id, [
-                'date' => '2026-09-22',
+                'date' => '2026-10-02',
                 'reason' => 'Updated reason',
             ])
             ->assertRedirect('/admin/demand-setup')
@@ -179,7 +174,7 @@ class DemandSetupTest extends TestCase
     public function test_normal_seeder_rerun_does_not_overwrite_an_admin_edited_schedule(): void
     {
         $this->seed(DemandSetupSeeder::class);
-        $schedule = FoodSchedule::query()->whereDate('date', '2026-09-01')->firstOrFail();
+        $schedule = FoodSchedule::query()->create(['date' => '2026-10-01']);
         $bun = FoodItem::query()->where('key', 'bun')->firstOrFail();
 
         $schedule->items()->sync([$bun->id]);
@@ -194,13 +189,6 @@ class DemandSetupTest extends TestCase
         $fieldStaff = User::factory()->create(['role' => UserRole::FieldStaff]);
 
         $this->actingAs($fieldStaff)->get('/admin/demand-setup')->assertForbidden();
-    }
-
-    private function scheduledDayCount(string $itemKey): int
-    {
-        return FoodSchedule::query()
-            ->whereHas('items', fn ($query) => $query->where('key', $itemKey))
-            ->count();
     }
 
     private function schoolWithCount(int $studentCount, string $effectiveDate): School

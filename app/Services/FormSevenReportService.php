@@ -2,13 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\Delivery;
-use App\Models\School;
+use App\Repositories\FormSevenReportRepository;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 
 class FormSevenReportService
 {
+    public function __construct(private readonly FormSevenReportRepository $reports) {}
+
     private const MONTH_NAMES = [
         1 => 'জানুয়ারি', 2 => 'ফেব্রুয়ারি', 3 => 'মার্চ', 4 => 'এপ্রিল',
         5 => 'মে', 6 => 'জুন', 7 => 'জুলাই', 8 => 'আগস্ট',
@@ -20,9 +21,7 @@ class FormSevenReportService
     {
         $start = Carbon::createFromFormat('!Y-m', $month)->startOfMonth();
         $end = $start->copy()->endOfMonth();
-        $schools = School::query()
-            ->orderBy('school_code')
-            ->get(['id', 'school_code', 'emis_code', 'name']);
+        $schools = $this->reports->schools();
 
         if ($schools->count() > 110) {
             throw ValidationException::withMessages([
@@ -30,9 +29,8 @@ class FormSevenReportService
             ]);
         }
 
-        $deliveries = Delivery::query()
-            ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
-            ->get(['school_id', 'bun_quantity', 'egg_quantity', 'banana_quantity'])
+        $deliveries = $this->reports
+            ->deliveriesForMonth($start->toDateString(), $end->toDateString())
             ->groupBy('school_id');
 
         $totals = $this->emptyItems();

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>নমুনা ফরম-০৭ — {{ $form['month_label'] }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/ui.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('form-7/form-seven.css') }}">
 </head>
 <body class="form-seven-screen">

@@ -46,6 +46,9 @@ class DemandSetupTest extends TestCase
         )->all());
         $this->assertSame(['banana'], FoodSchedule::query()->whereDate('date', '2026-09-22')->firstOrFail()->items()->pluck('key')->all());
         $this->assertSame(['boiled_egg', 'bun'], FoodSchedule::query()->whereDate('date', '2026-09-06')->firstOrFail()->items()->orderBy('key')->pluck('key')->all());
+        $this->assertSame(['bun'], FoodSchedule::query()->whereDate('date', '2026-09-07')->firstOrFail()->items()->pluck('key')->all());
+        $this->assertSame(['banana'], FoodSchedule::query()->whereDate('date', '2026-09-08')->firstOrFail()->items()->pluck('key')->all());
+        $this->assertSame(['boiled_egg', 'bun'], FoodSchedule::query()->whereDate('date', '2026-09-13')->firstOrFail()->items()->orderBy('key')->pluck('key')->all());
         $this->assertSame(['bun'], FoodSchedule::query()->whereDate('date', '2026-09-27')->firstOrFail()->items()->pluck('key')->all());
         $this->assertSame(['boiled_egg', 'bun'], FoodSchedule::query()->whereDate('date', '2026-09-30')->firstOrFail()->items()->orderBy('key')->pluck('key')->all());
         $this->assertDatabaseMissing('food_schedules', ['date' => '2026-09-04 00:00:00']);

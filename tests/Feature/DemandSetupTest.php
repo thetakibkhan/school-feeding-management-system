@@ -11,10 +11,8 @@ use App\Models\SchoolStudentCount;
 use App\Models\User;
 use App\Services\DemandCalculator;
 use Database\Seeders\DemandSetupSeeder;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class DemandSetupTest extends TestCase
@@ -39,17 +37,19 @@ class DemandSetupTest extends TestCase
         $this->assertSame(12, $this->scheduledDayCount('boiled_egg'));
         $this->assertSame(5, $this->scheduledDayCount('banana'));
         $this->assertSame([
-            '2026-09-01', '2026-09-02', '2026-09-03', '2026-09-04', '2026-09-06',
-            '2026-09-07', '2026-09-08', '2026-09-09', '2026-09-10', '2026-09-14',
+            '2026-09-01', '2026-09-02', '2026-09-03', '2026-09-06', '2026-09-07',
+            '2026-09-08', '2026-09-09', '2026-09-10', '2026-09-13', '2026-09-14',
             '2026-09-15', '2026-09-16', '2026-09-17', '2026-09-20', '2026-09-21',
-            '2026-09-22', '2026-09-23', '2026-09-24', '2026-09-27', '2026-09-29',
-            '2026-09-30',
+            '2026-09-22', '2026-09-23', '2026-09-24', '2026-09-27', '2026-09-29', '2026-09-30',
         ], FoodSchedule::query()->orderBy('date')->get()->map(
             fn (FoodSchedule $schedule): string => $schedule->date->toDateString(),
         )->all());
         $this->assertSame(['banana'], FoodSchedule::query()->whereDate('date', '2026-09-22')->firstOrFail()->items()->pluck('key')->all());
-        $this->assertSame(['bun', 'boiled_egg'], FoodSchedule::query()->whereDate('date', '2026-09-30')->firstOrFail()->items()->orderBy('key')->pluck('key')->all());
-        $this->assertDatabaseMissing('food_schedules', ['date' => '2026-09-05 00:00:00']);
+        $this->assertSame(['boiled_egg', 'bun'], FoodSchedule::query()->whereDate('date', '2026-09-06')->firstOrFail()->items()->orderBy('key')->pluck('key')->all());
+        $this->assertSame(['bun'], FoodSchedule::query()->whereDate('date', '2026-09-27')->firstOrFail()->items()->pluck('key')->all());
+        $this->assertSame(['boiled_egg', 'bun'], FoodSchedule::query()->whereDate('date', '2026-09-30')->firstOrFail()->items()->orderBy('key')->pluck('key')->all());
+        $this->assertDatabaseMissing('food_schedules', ['date' => '2026-09-04 00:00:00']);
+        $this->assertDatabaseMissing('food_schedules', ['date' => '2026-09-28 00:00:00']);
         $this->assertDatabaseMissing('non_working_dates', ['date' => '2026-09-25 00:00:00']);
     }
 
@@ -58,8 +58,7 @@ class DemandSetupTest extends TestCase
         $this->seed(DemandSetupSeeder::class);
         $school = $this->schoolWithCount(101, '2026-09-01');
         $bun = FoodItem::query()->where('key', 'bun')->firstOrFail();
-        $oldDateSchedule = FoodSchedule::query()->create(['date' => '2026-09-14']);
-        $oldDateSchedule->items()->sync([$bun->id]);
+        $oldDateSchedule = FoodSchedule::query()->whereDate('date', '2026-09-14')->firstOrFail();
         $schedule = FoodSchedule::query()->create(['date' => '2026-10-01']);
         $schedule->items()->sync([$bun->id]);
         SchoolStudentCount::query()->create([
@@ -187,14 +186,23 @@ class DemandSetupTest extends TestCase
             'date' => '2026-10-02',
             'reason' => 'Test non-working date',
         ]);
-        $this->createDeliveryTable();
+        $school = $this->schoolWithCount(100, '2026-09-01');
+        $fieldStaff = User::factory()->create(['role' => UserRole::FieldStaff]);
         DB::table('deliveries')->insert([
+            'school_id' => $school->id,
             'date' => '2026-10-01',
+            'chalan_disk' => 'local',
+            'chalan_path' => 'test-chalan.jpg',
+            'created_by_user_id' => $fieldStaff->id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
         DB::table('deliveries')->insert([
+            'school_id' => $school->id,
             'date' => '2026-10-02',
+            'chalan_disk' => 'local',
+            'chalan_path' => 'test-chalan.jpg',
+            'created_by_user_id' => $fieldStaff->id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -279,14 +287,5 @@ class DemandSetupTest extends TestCase
     private function admin(): User
     {
         return User::factory()->create(['role' => UserRole::Admin]);
-    }
-
-    private function createDeliveryTable(): void
-    {
-        Schema::create('deliveries', function (Blueprint $table): void {
-            $table->id();
-            $table->date('date');
-            $table->timestamps();
-        });
     }
 }

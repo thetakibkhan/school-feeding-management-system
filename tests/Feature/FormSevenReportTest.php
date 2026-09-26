@@ -4,7 +4,10 @@ namespace Tests\Feature;
 
 use App\Enums\UserRole;
 use App\Models\Delivery;
+use App\Models\FoodItem;
+use App\Models\FoodSchedule;
 use App\Models\School;
+use App\Models\SchoolStudentCount;
 use App\Models\User;
 use App\Services\FormSevenReportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -82,6 +85,53 @@ class FormSevenReportTest extends TestCase
         $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
             ->get('/admin/reports/form-7?month=2026-06')
             ->assertSessionHasErrors('month');
+    }
+
+    public function test_pdf_download_is_blocked_when_a_scheduled_school_delivery_is_missing(): void
+    {
+        $school = $this->school('AN-001', '11111111111', 'প্রথম বিদ্যালয়');
+        $this->scheduleBunFor($school, '2026-09-02');
+
+        $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
+            ->get('/admin/reports/form-7/pdf?month=2026-09')
+            ->assertRedirect()
+            ->assertSessionHasErrors('month');
+    }
+
+    public function test_admin_can_download_form_seven_pdf_from_complete_recorded_data(): void
+    {
+        $school = $this->school('AN-001', '11111111111', 'প্রথম বিদ্যালয়');
+        $this->scheduleBunFor($school, '2026-09-02');
+        $this->delivery($school, User::factory()->create(['role' => UserRole::FieldStaff]), '2026-09-02', 90, 0, 0);
+
+        $this->get('/admin/reports/form-7/pdf?month=2026-09')->assertRedirect('/login');
+        $this->actingAs(User::factory()->create(['role' => UserRole::FieldStaff]))
+            ->get('/admin/reports/form-7/pdf?month=2026-09')
+            ->assertForbidden();
+
+        $response = $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
+            ->get('/admin/reports/form-7/pdf?month=2026-09')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/pdf');
+
+        $this->assertStringStartsWith('%PDF', $response->getContent());
+    }
+
+    private function scheduleBunFor(School $school, string $date): void
+    {
+        SchoolStudentCount::query()->create([
+            'school_id' => $school->id,
+            'student_count' => 100,
+            'effective_start_date' => '2026-09-01',
+        ]);
+        $item = FoodItem::query()->create([
+            'key' => 'bun',
+            'name' => 'Bun',
+            'unit' => 'packets',
+            'unit_weight_grams' => 120,
+        ]);
+        $schedule = FoodSchedule::query()->create(['date' => $date]);
+        $schedule->items()->attach($item);
     }
 
     private function school(string $code, string $emis, string $name): School

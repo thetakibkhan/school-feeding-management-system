@@ -4,8 +4,6 @@ namespace Tests\Feature;
 
 use App\Enums\UserRole;
 use App\Models\Delivery;
-use App\Models\FoodItem;
-use App\Models\FoodSchedule;
 use App\Models\School;
 use App\Models\SchoolStudentCount;
 use App\Models\User;
@@ -52,12 +50,19 @@ class FormFourReportTest extends TestCase
         $this->assertTrue($page['daily_rows'][1]['entry_recorded']);
         $this->assertSame('CH-SEP-02', $page['daily_rows'][1]['chalan_number']);
         $this->assertSame('2026-09-01', $page['daily_rows'][1]['chalan_date']);
-        $this->assertSame(91, $page['daily_rows'][1]['bun_quantity']);
+        $this->assertSame(91, $page['daily_rows'][1]['quantities']['bun']);
         $this->assertFalse($page['daily_rows'][0]['entry_recorded']);
         $this->assertSame(20, $page['missing_scheduled_entry_count']);
         $this->assertSame(91, $page['totals']['bun']);
         $this->assertSame(90, $page['totals']['boiled_egg']);
         $this->assertSame(0, $page['totals']['banana']);
+
+        $delivery = Delivery::query()->firstOrFail();
+        $delivery->update(['date' => '2026-10-31', 'chalan_date' => '2026-10-30']);
+        $october = app(FormFourReportService::class)->forMonth('2026-10');
+        $this->assertCount(31, $october['schools'][0]['daily_rows']);
+        $this->assertTrue($october['schools'][0]['daily_rows'][30]['entry_recorded']);
+        $this->assertSame(91, $october['schools'][0]['totals']['bun']);
     }
 
     public function test_form_four_preview_is_an_admin_only_official_form_preview(): void
@@ -78,11 +83,20 @@ class FormFourReportTest extends TestCase
             ->get(route('admin.reports.form-four', ['month' => '2026-09']))
             ->assertOk()
             ->assertSee('Official Form 4')
-            ->assertSee('2026-09-01')
+            ->assertSee('০১/০৯/২০২৬')
             ->assertSee('Download PDF');
+
+        $pdf = $this->get(route('admin.reports.form-four.pdf', ['month' => '2026-09']))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/pdf')
+            ->assertHeader('Content-Disposition', 'attachment; filename="form-4-2026-09.pdf"');
+        $this->assertStringStartsWith('%PDF-', $pdf->getContent());
 
         $this->actingAs(User::factory()->create(['role' => UserRole::FieldStaff]))
             ->get(route('admin.reports.form-four', ['month' => '2026-09']))
+            ->assertForbidden();
+
+        $this->get(route('admin.reports.form-four.pdf', ['month' => '2026-09']))
             ->assertForbidden();
     }
 }

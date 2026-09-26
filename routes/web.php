@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\DemandSetupController;
 use App\Http\Controllers\Admin\SchoolManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Reports\FormSevenReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/dashboard', 'dashboard')
@@ -12,6 +13,10 @@ Route::view('/dashboard', 'dashboard')
 Route::view('/admin', 'dashboard')
     ->middleware(['auth', 'role:admin'])
     ->name('admin.dashboard');
+
+Route::get('/admin/reports/form-7', FormSevenReportController::class)
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.reports.form-seven');
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin/users')->name('admin.users.')->group(function (): void {
     Route::get('/', [UserManagementController::class, 'index'])->name('index');

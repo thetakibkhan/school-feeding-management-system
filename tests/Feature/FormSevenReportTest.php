@@ -29,6 +29,8 @@ class FormSevenReportTest extends TestCase
         $form = app(FormSevenReportService::class)->forMonth('2026-06');
 
         $this->assertCount(2, $form['rows']);
+        $this->assertSame('জুন-২৬', $form['month_label']);
+        $this->assertSame('১৮৫', FormSevenReportService::bengaliDigits(185));
         $this->assertSame('প্রথম বিদ্যালয়', $form['rows'][0]['school']->name);
         $this->assertSame(['chalans' => 2, 'quantity' => 185], $form['rows'][0]['bun']);
         $this->assertSame(['chalans' => 2, 'quantity' => 200], $form['rows'][0]['egg']);
@@ -52,18 +54,32 @@ class FormSevenReportTest extends TestCase
 
         $html = $response->getContent();
         $this->assertIsString($html);
-        $this->assertSame(5, substr_count($html, 'data-form7-page='));
+        $this->assertSame(6, substr_count($html, 'data-form7-page='));
         $this->assertSame(110, substr_count($html, 'data-form7-row='));
         $this->assertStringContainsString('প্রথম বিদ্যালয়', $html);
         $this->assertStringContainsString('form-7/page-1.png', $html);
         $this->assertStringNotContainsString('Shortfall', $html);
         $this->assertStringNotContainsString('Entry status', $html);
+        $this->assertFileExists(public_path('form-7/page-1.png'));
+        $this->assertFileExists(public_path('form-7/page-6.png'));
+        $this->assertFileExists(public_path('fonts/NotoSansBengali-Regular.ttf'));
     }
 
     public function test_invalid_month_is_rejected(): void
     {
         $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
             ->get('/admin/reports/form-7?month=2026-13')
+            ->assertSessionHasErrors('month');
+    }
+
+    public function test_more_than_110_schools_cannot_be_silently_cut_off(): void
+    {
+        for ($index = 1; $index <= 111; $index++) {
+            $this->school(sprintf('AN-%03d', $index), sprintf('%011d', $index), 'পরীক্ষা বিদ্যালয়');
+        }
+
+        $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
+            ->get('/admin/reports/form-7?month=2026-06')
             ->assertSessionHasErrors('month');
     }
 

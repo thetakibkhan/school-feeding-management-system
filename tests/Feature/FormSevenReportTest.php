@@ -58,6 +58,7 @@ class FormSevenReportTest extends TestCase
         $this->assertSame(110, substr_count($html, 'data-form7-row='));
         $this->assertStringContainsString('প্রথম বিদ্যালয়', $html);
         $this->assertStringContainsString('form-7/page-1.png', $html);
+        $this->assertStringContainsString('resources/css/ui.css', $html);
         $this->assertStringNotContainsString('Shortfall', $html);
         $this->assertStringNotContainsString('Entry status', $html);
         $this->assertFileExists(public_path('form-7/page-1.png'));

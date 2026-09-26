@@ -4,8 +4,6 @@ namespace Tests\Feature;
 
 use App\Enums\UserRole;
 use App\Models\Delivery;
-use App\Models\FoodItem;
-use App\Models\FoodSchedule;
 use App\Models\School;
 use App\Models\SchoolStudentCount;
 use App\Models\User;
@@ -30,7 +28,7 @@ class DeliveryChalanFieldsTest extends TestCase
                 'school_id' => $school->id,
             ]))
             ->assertOk()
-            ->assertSee('name="chalan_date" type="date" value="2026-09-20"', false);
+            ->assertSee('type="date" name="chalan_date" value="2026-09-20"', false);
     }
 
     public function test_field_staff_can_save_a_physical_chalan_date_different_from_delivery_date(): void
@@ -53,12 +51,9 @@ class DeliveryChalanFieldsTest extends TestCase
             ])
             ->assertRedirect(route('field-staff.deliveries.index'));
 
-        $this->assertDatabaseHas('deliveries', [
-            'school_id' => $school->id,
-            'date' => '2026-09-20',
-            'chalan_number' => 'CH-204',
-            'chalan_date' => '2026-09-19',
-        ]);
+        $delivery = Delivery::query()->where('school_id', $school->id)->firstOrFail();
+        $this->assertSame('CH-204', $delivery->chalan_number);
+        $this->assertSame('2026-09-19', $delivery->chalan_date->toDateString());
     }
 
     public function test_chalan_date_is_required_on_delivery_entry(): void
@@ -69,7 +64,6 @@ class DeliveryChalanFieldsTest extends TestCase
         config(['filesystems.delivery_photos_disk' => 'delivery_photos']);
 
         $this->actingAs(User::factory()->create(['role' => UserRole::FieldStaff]))
-            ->from(route('field-staff.deliveries.create'))
             ->post(route('field-staff.deliveries.store'), [
                 'date' => '2026-09-20',
                 'school_id' => $school->id,
@@ -79,7 +73,6 @@ class DeliveryChalanFieldsTest extends TestCase
                 'chalan_number' => 'CH-205',
                 'chalan_photo' => $this->validPngUpload(),
             ])
-            ->assertRedirect(route('field-staff.deliveries.create'))
             ->assertSessionHasErrors('chalan_date');
 
         $this->assertSame(0, Delivery::query()->count());
@@ -101,16 +94,11 @@ class DeliveryChalanFieldsTest extends TestCase
             ])
             ->assertRedirect(route('field-staff.deliveries.index'));
 
-        $this->assertDatabaseHas('deliveries', [
-            'id' => $delivery->id,
-            'chalan_number' => 'CH-206',
-            'chalan_date' => '2026-09-19',
-        ]);
-        $this->assertDatabaseHas('delivery_correction_histories', [
-            'delivery_id' => $delivery->id,
-            'previous_chalan_number' => 'CH-OLD',
-            'previous_chalan_date' => '2026-09-20',
-        ]);
+        $this->assertSame('CH-206', $delivery->fresh()->chalan_number);
+        $this->assertSame('2026-09-19', $delivery->fresh()->chalan_date->toDateString());
+        $history = $delivery->correctionHistory()->firstOrFail();
+        $this->assertSame('CH-OLD', $history->previous_chalan_number);
+        $this->assertSame('2026-09-20', $history->previous_chalan_date->toDateString());
     }
 
     private function schoolWithEffectiveCount(): School

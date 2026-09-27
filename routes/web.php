@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Reports\FormSevenReportController;
 use App\Http\Controllers\Reports\FormFourPdfController;
 use App\Http\Controllers\Reports\FormFourReportController;
+use App\Http\Controllers\Reports\StockFormController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/dashboard', 'dashboard')
@@ -27,6 +28,15 @@ Route::get('/admin/reports/form-4', FormFourReportController::class)
 Route::get('/admin/reports/form-4/pdf', FormFourPdfController::class)
     ->middleware(['auth', 'role:admin'])
     ->name('admin.reports.form-four.pdf');
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin/reports/form-{form}')
+    ->where(['form' => '12|13'])->name('admin.reports.stock.')->group(function (): void {
+        Route::get('/', [StockFormController::class, 'information'])->name('information');
+        Route::put('/information', [StockFormController::class, 'savePeriod'])->name('information.update');
+        Route::put('/schools/{school}', [StockFormController::class, 'saveSchool'])->name('schools.update');
+        Route::get('/preview', [StockFormController::class, 'preview'])->name('preview');
+        Route::get('/pdf', [StockFormController::class, 'pdf'])->name('pdf');
+    });
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin/users')->name('admin.users.')->group(function (): void {
     Route::get('/', [UserManagementController::class, 'index'])->name('index');

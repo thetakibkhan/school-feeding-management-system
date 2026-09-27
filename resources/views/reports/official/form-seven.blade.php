@@ -73,10 +73,10 @@
                     <img class="form-seven-page__art" src="{{ asset('form-7/page-'.$page.'.png') }}" alt="" aria-hidden="true">
 
                     @if ($page === 1)
-                        <div class="form-seven-title-replacement">
+                        <div class="form-seven-title-replacement" style="background-color:#fff!important;color:#111!important;">
                             {{ $form['month_label'] }} মাসের বনরুটি (১২০ গ্রাম), সিদ্ধ ডিম (৬০ গ্রাম) ও কলা (১০০ গ্রাম) বিদ্যালয় পর্যায়ে সরবরাহের বিবরণী
                         </div>
-                        <div class="form-seven-supplier-replacement" style="{{ $position(291, 420, 448, 478) }}">{{ $form['supplier_name'] }}</div>
+                        <div class="form-seven-supplier-replacement" style="{{ $position(291, 420, 448, 478) }};background-color:#fff!important;color:#111!important;">{{ $form['supplier_name'] }}</div>
                     @endif
 
                     @if ($page <= 5)
@@ -103,7 +103,7 @@
                             <div data-form7-row="{{ $recordIndex + 1 }}" class="form-seven-row">
                                 @foreach ($cells as $column => $cell)
                                     <span class="form-seven-cell {{ $column === 0 ? 'form-seven-cell--first' : '' }} {{ $column === 1 ? 'form-seven-cell--school' : '' }} {{ $column === 2 ? 'form-seven-cell--emis' : '' }} {{ $rowIndex === 0 ? 'form-seven-cell--top' : '' }}"
-                                          style="{{ $position($columnBounds[$column], $columnBounds[$column + 1], $bounds[$rowIndex], $bounds[$rowIndex + 1]) }}">{{ $cell }}</span>
+                                          style="{{ $position($columnBounds[$column], $columnBounds[$column + 1], $bounds[$rowIndex], $bounds[$rowIndex + 1]) }};background-color:#fff!important;color:#111!important;">{{ $cell }}</span>
                                 @endforeach
                             </div>
                         @endfor

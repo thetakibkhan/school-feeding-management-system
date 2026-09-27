@@ -29,7 +29,7 @@
         <div class="official-page">
             <img class="official-artwork" src="{{ asset($page['artwork']) }}" alt="" aria-hidden="true">
             @foreach ($page['overlays'] as $field)
-                <div class="official-field" style="left:{{ $field['x'] / 993 * 100 }}%;top:{{ $field['y'] / 1404 * 100 }}%;width:{{ $field['width'] / 993 * 100 }}%;height:{{ $field['height'] / 1404 * 100 }}%;font-size:{{ $field['font_size'] / 993 * 100 }}cqw;text-align:{{ $field['align'] }}">{{ $field['text'] }}</div>
+                <div class="official-field" style="left:{{ $field['x'] / 993 * 100 }}%;top:{{ $field['y'] / 1404 * 100 }}%;width:{{ $field['width'] / 993 * 100 }}%;height:{{ $field['height'] / 1404 * 100 }}%;font-size:{{ $field['font_size'] / 993 * 100 }}cqw;text-align:{{ $field['align'] }};background-color:#fff!important;color:#111!important;">{{ $field['text'] }}</div>
             @endforeach
         </div>
     @endforeach

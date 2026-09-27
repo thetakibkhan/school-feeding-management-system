@@ -40,7 +40,7 @@
                 <img class="form-four-artwork" src="{{ asset('form-4/page-1.png') }}" alt="" aria-hidden="true">
                 @foreach ($page['overlays'] as $overlay)
                     <div @class(['form-four-overlay', 'font-bangla', 'form-four-overlay--bordered' => $overlay['border']])
-                        style="left:{{ $overlay['x'] / 993 * 100 }}%;top:{{ $overlay['y'] / 1404 * 100 }}%;width:{{ $overlay['width'] / 993 * 100 }}%;height:{{ $overlay['height'] / 1404 * 100 }}%;font-size:{{ $overlay['font_size'] * 100 / 993 }}cqw;font-weight:{{ $overlay['bold'] ? '700' : '400' }};text-align:{{ $overlay['align'] }};">
+                        style="left:{{ $overlay['x'] / 993 * 100 }}%;top:{{ $overlay['y'] / 1404 * 100 }}%;width:{{ $overlay['width'] / 993 * 100 }}%;height:{{ $overlay['height'] / 1404 * 100 }}%;font-size:{{ $overlay['font_size'] * 100 / 993 }}cqw;font-weight:{{ $overlay['bold'] ? '700' : '400' }};text-align:{{ $overlay['align'] }};background-color:#fff!important;color:#111!important;">
                         {!! nl2br(e($overlay['text'])) !!}
                     </div>
                 @endforeach

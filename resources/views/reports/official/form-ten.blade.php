@@ -82,7 +82,7 @@
             <img class="form-ten-artwork" src="{{ asset('form-10/page-1.png') }}" alt="" aria-hidden="true">
             @foreach ($overlays as $overlay)
                 <div class="form-ten-overlay {{ $overlay['font_family'] === 'latin' ? 'form-ten-overlay--latin' : '' }} {{ str_contains($overlay['text'], 'উপযুক্ত বিবরণ') || str_contains($overlay['text'], 'এমতাবস্থায়') ? 'form-ten-overlay--paragraph' : '' }}"
-                    style="left:{{ $overlay['x'] / 993 * 100 }}%;top:{{ $overlay['y'] / 1404 * 100 }}%;width:{{ $overlay['width'] / 993 * 100 }}%;height:{{ $overlay['height'] / 1404 * 100 }}%;font-size:{{ $overlay['font_size'] * 100 / 993 }}cqw;line-height:{{ $overlay['line_height'] }};font-weight:{{ $overlay['bold'] ? '700' : '400' }};text-align:{{ $overlay['align'] }};justify-content:{{ $overlay['align'] === 'left' ? 'flex-start' : ($overlay['align'] === 'right' ? 'flex-end' : 'center') }};">
+                    style="left:{{ $overlay['x'] / 993 * 100 }}%;top:{{ $overlay['y'] / 1404 * 100 }}%;width:{{ $overlay['width'] / 993 * 100 }}%;height:{{ $overlay['height'] / 1404 * 100 }}%;font-size:{{ $overlay['font_size'] * 100 / 993 }}cqw;line-height:{{ $overlay['line_height'] }};font-weight:{{ $overlay['bold'] ? '700' : '400' }};text-align:{{ $overlay['align'] }};justify-content:{{ $overlay['align'] === 'left' ? 'flex-start' : ($overlay['align'] === 'right' ? 'flex-end' : 'center') }};background-color:#fff!important;color:#111!important;">
                     {!! nl2br(e($overlay['text'])) !!}
                 </div>
             @endforeach

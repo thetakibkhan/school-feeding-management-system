@@ -36,8 +36,13 @@ class StockFormPdfWriter
                 $width = self::mm($field['width'], 993, 210);
                 $height = self::mm($field['height'], 1404, 297);
                 $size = $field['font_size'] * .6;
-                $html = '<div style="box-sizing:border-box;width:'.$width.'mm;height:'.$height.'mm;overflow:hidden;background:#fff;color:#111;font-family:notobengali;font-size:'.$size.'pt;line-height:1.25;text-align:'.$field['align'].'">'.e($field['text']).'</div>';
-                $pdf->WriteFixedPosHTML($html, self::mm($field['x'], 993, 210), self::mm($field['y'], 1404, 297), $width, $height, 'hidden');
+                $topPadding = self::mm((int) max(0, round(($field['height'] - $field['font_size'] * 1.25) / 2)), 1404, 297);
+                $x = self::mm($field['x'], 993, 210);
+                $y = self::mm($field['y'], 1404, 297);
+                $pdf->SetFillColor(255, 255, 255);
+                $pdf->Rect($x, $y, $width, $height, 'F');
+                $html = '<div style="width:'.$width.'mm;overflow:hidden;color:#111;font-family:notobengali;font-size:'.$size.'pt;line-height:1.25;text-align:'.$field['align'].'">'.e($field['text']).'</div>';
+                $pdf->WriteFixedPosHTML($html, $x, $y + $topPadding, $width, $height - $topPadding, 'hidden');
             }
         }
 

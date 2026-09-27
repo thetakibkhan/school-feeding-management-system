@@ -112,19 +112,19 @@
                     @if ($page === 5)
                         <div class="form-seven-table-mask" style="{{ $position(112, 966, 978, 1028) }}"></div>
                         <span class="form-seven-cell form-seven-cell--first form-seven-cell--total-label"
-                              style="{{ $position(112, 526, 978, 1028) }}">সর্বমোট</span>
+                              style="{{ $position(112, 526, 978, 1028) }};background-color:#f1f1f1!important;color:#111!important;">সর্বমোট</span>
                         @php($totalItems = [$form['totals']['bun'], $form['totals']['egg'], $form['totals']['banana']])
                         @foreach ($totalItems as $itemIndex => $item)
                             @foreach (['chalans', 'quantity'] as $measureIndex => $measure)
                                 @php($column = 3 + $itemIndex * 2 + $measureIndex)
                                 <span class="form-seven-cell form-seven-cell--total"
-                                      style="{{ $position($columnBounds[$column], $columnBounds[$column + 1], 978, 1028) }}">{{ $number($item[$measure]) }}</span>
+                                      style="{{ $position($columnBounds[$column], $columnBounds[$column + 1], 978, 1028) }};background-color:#f1f1f1!important;color:#111!important;">{{ $number($item[$measure]) }}</span>
                             @endforeach
                         @endforeach
 
-                        <div class="form-seven-notes">
-                            <p>উপযুক্ত বিবরণ অনুযায়ী অত্র উপজেলার {{ $number(count($form['rows'])) }} টি সরকারি প্রাথমিক বিদ্যালয়ে {{ $form['month_label'] }} মাসের স্পেসিফিকেশন অনুযায়ী সরবরাহকৃত {{ $number($form['totals']['bun']['quantity']) }} প্যাকেট বনরুটি, {{ $number($form['totals']['egg']['quantity']) }} পিস সিদ্ধ ডিম ও {{ $number($form['totals']['banana']['quantity']) }} পিস কলা সরবরাহের চালানের মূল কপি অত্র কার্যালয়ে সংরক্ষিত আছে।</p>
-                            <p>এমতাবস্থায়, উক্ত সরবরাহকারী ঠিকাদারকে {{ $form['month_label'] }} মাসের {{ $number($form['totals']['bun']['quantity']) }} প্যাকেট বনরুটি, {{ $number($form['totals']['egg']['quantity']) }} পিস সিদ্ধ ডিম ও {{ $number($form['totals']['banana']['quantity']) }} পিস কলা সরবরাহের বিল পরিশোধ করার সুপারিশ করা হলো।</p>
+                        <div class="form-seven-notes" style="background-color:#fff!important;color:#111!important;">
+                            <p style="background-color:transparent!important;color:#111!important;">উপযুক্ত বিবরণ অনুযায়ী অত্র উপজেলার {{ $number(count($form['rows'])) }} টি সরকারি প্রাথমিক বিদ্যালয়ে {{ $form['month_label'] }} মাসের স্পেসিফিকেশন অনুযায়ী সরবরাহকৃত {{ $number($form['totals']['bun']['quantity']) }} প্যাকেট বনরুটি, {{ $number($form['totals']['egg']['quantity']) }} পিস সিদ্ধ ডিম ও {{ $number($form['totals']['banana']['quantity']) }} পিস কলা সরবরাহের চালানের মূল কপি অত্র কার্যালয়ে সংরক্ষিত আছে।</p>
+                            <p style="background-color:transparent!important;color:#111!important;">এমতাবস্থায়, উক্ত সরবরাহকারী ঠিকাদারকে {{ $form['month_label'] }} মাসের {{ $number($form['totals']['bun']['quantity']) }} প্যাকেট বনরুটি, {{ $number($form['totals']['egg']['quantity']) }} পিস সিদ্ধ ডিম ও {{ $number($form['totals']['banana']['quantity']) }} পিস কলা সরবরাহের বিল পরিশোধ করার সুপারিশ করা হলো।</p>
                         </div>
                     @endif
                 </section>

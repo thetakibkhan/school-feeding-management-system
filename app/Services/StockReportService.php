@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Delivery;
+use App\Models\FoodSchedule;
 use App\Models\School;
 use App\Models\SchoolMonthlyStockInput;
 use Illuminate\Support\Carbon;
@@ -32,6 +33,9 @@ class StockReportService
         $start = Carbon::createFromFormat('!Y-m', $month)->startOfMonth();
         $end = $start->copy()->endOfMonth();
         $schools = School::query()->orderBy('school_code')->get();
+        $scheduledDates = FoodSchedule::query()
+            ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+            ->get(['date'])->toBase()->map(fn (FoodSchedule $schedule): string => $schedule->date->toDateString());
         $inputs = SchoolMonthlyStockInput::query()->where('month', $month)->get()->keyBy('school_id');
         $deliveries = Delivery::query()
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
@@ -44,13 +48,15 @@ class StockReportService
         foreach ($schools as $school) {
             $input = $inputs->get($school->id);
             $schoolDeliveries = $deliveries->get($school->id, collect());
+            $enteredDates = $schoolDeliveries->toBase()->map(fn (Delivery $delivery): string => $delivery->date->toDateString());
+            $missingDeliveryCount = $scheduledDates->diff($enteredDates)->count();
             $items = [];
-            $complete = $input !== null;
+            $complete = $input !== null && $missingDeliveryCount === 0;
             foreach (self::ITEMS as $item) {
                 $opening = $input?->{$item.'_opening'};
                 $distributed = $input?->{$item.'_distributed'};
                 $received = isset(self::DELIVERY_COLUMNS[$item])
-                    ? (int) $schoolDeliveries->sum(self::DELIVERY_COLUMNS[$item])
+                    ? ($missingDeliveryCount === 0 ? (int) $schoolDeliveries->sum(self::DELIVERY_COLUMNS[$item]) : null)
                     : $input?->{$item.'_received'};
                 $available = $opening === null || $received === null ? null : (int) $opening + (int) $received;
                 $closing = $available === null || $distributed === null ? null : $available - (int) $distributed;
@@ -67,6 +73,7 @@ class StockReportService
                 'school' => $school,
                 'input' => $input,
                 'student_count' => $studentCounts[$school->id] ?? null,
+                'missing_delivery_count' => $missingDeliveryCount,
                 'items' => $items,
                 'complete' => $complete,
             ];
@@ -105,9 +112,12 @@ class StockReportService
             ->get(['bun_quantity', 'egg_quantity', 'banana_quantity']);
 
         foreach (self::ITEMS as $item) {
+            if (! array_key_exists($item.'_opening', $data) || ! array_key_exists($item.'_distributed', $data)) {
+                continue;
+            }
             $quantityReceived = isset(self::DELIVERY_COLUMNS[$item])
                 ? (int) $received->sum(self::DELIVERY_COLUMNS[$item])
-                : (int) $data[$item.'_received'];
+                : (int) ($data[$item.'_received'] ?? 0);
             if ($data[$item.'_distributed'] > $data[$item.'_opening'] + $quantityReceived) {
                 throw ValidationException::withMessages([
                     $item.'_distributed' => 'Distributed quantity cannot exceed opening stock plus received quantity.',

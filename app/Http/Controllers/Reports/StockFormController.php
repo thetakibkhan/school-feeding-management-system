@@ -13,6 +13,7 @@ use App\Services\StockReportService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -29,6 +30,13 @@ class StockFormController extends Controller
     {
         $month = $this->month($request);
         $type = $this->formType($form);
+        if ($form === '12') {
+            $schools = School::query()->orderBy('school_code')->get(['id', 'school_code', 'name']);
+            $schoolId = (string) $request->query('school_id', 'all');
+
+            return view('reports.official.form-twelve-select', compact('month', 'schools', 'schoolId'));
+        }
+
         $report = $this->reports->forMonth($month);
         $completedCount = count(array_filter($report['schools'], fn (array $school): bool => $this->readySchool($form, $school)));
         $period = StockReportPeriod::query()->where('form_type', $type)->where('month', $month)->first();
@@ -40,6 +48,9 @@ class StockFormController extends Controller
 
     public function savePeriod(Request $request, string $form): RedirectResponse
     {
+        if ($form === '12') {
+            return to_route('admin.reports.stock.information', ['form' => $form, 'month' => $this->month($request)]);
+        }
         $type = $this->formType($form);
         $data = $request->validate([
             'month' => ['required', 'date_format:Y-m'],
@@ -59,6 +70,7 @@ class StockFormController extends Controller
 
     public function saveSchool(Request $request, string $form, School $school): RedirectResponse
     {
+        abort_if($form === '12', 404);
         $this->formType($form);
         $rules = [
             'month' => ['required', 'date_format:Y-m'],
@@ -90,6 +102,21 @@ class StockFormController extends Controller
     {
         $month = $this->month($request);
         $type = $this->formType($form);
+        if ($form === '12') {
+            $schoolId = (string) $request->query('school_id', 'all');
+            $report = $this->selectedSchoolReport($this->reports->forMonth($month), $schoolId);
+            if (! $this->ready($form, $report)) {
+                return to_route('admin.reports.stock.information', ['form' => $form, 'month' => $month, 'school_id' => $schoolId])
+                    ->withErrors('Required Form 12 data is missing for the selected school or month.');
+            }
+            $period = StockReportPeriod::query()->where('form_type', $type)->where('month', $month)->first()
+                ?? new StockReportPeriod(['district_name' => 'চট্টগ্রাম', 'upazila_name' => 'আনোয়ারা']);
+            $pages = $this->pages($form, $report, $period);
+            $ready = true;
+
+            return view('reports.official.stock-preview', compact('form', 'month', 'report', 'pages', 'ready', 'schoolId'));
+        }
+
         $period = StockReportPeriod::query()->where('form_type', $type)->where('month', $month)->first();
         if (! $period) {
             return to_route('admin.reports.stock.information', ['form' => $form, 'month' => $month])
@@ -98,16 +125,24 @@ class StockFormController extends Controller
         $report = $this->reports->forMonth($month);
         $pages = $this->pages($form, $report, $period);
         $ready = $this->ready($form, $report);
+        $schoolId = 'all';
 
-        return view('reports.official.stock-preview', compact('form', 'month', 'report', 'pages', 'ready'));
+        return view('reports.official.stock-preview', compact('form', 'month', 'report', 'pages', 'ready', 'schoolId'));
     }
 
     public function pdf(Request $request, string $form): Response
     {
         $month = $this->month($request);
         $type = $this->formType($form);
-        $period = StockReportPeriod::query()->where('form_type', $type)->where('month', $month)->first();
+        $schoolId = (string) $request->query('school_id', 'all');
         $report = $this->reports->forMonth($month);
+        if ($form === '12') {
+            $report = $this->selectedSchoolReport($report, $schoolId);
+            $period = StockReportPeriod::query()->where('form_type', $type)->where('month', $month)->first()
+                ?? new StockReportPeriod(['district_name' => 'চট্টগ্রাম', 'upazila_name' => 'আনোয়ারা']);
+        } else {
+            $period = StockReportPeriod::query()->where('form_type', $type)->where('month', $month)->first();
+        }
         if (! $period || ! $this->ready($form, $report)) {
             throw ValidationException::withMessages(['report' => 'Save all required report and school stock information before downloading the official PDF.']);
         }
@@ -179,6 +214,28 @@ class StockFormController extends Controller
         }
 
         return true;
+    }
+
+    /** @param array<string, mixed> $report
+     * @return array<string, mixed>
+     */
+    private function selectedSchoolReport(array $report, string $schoolId): array
+    {
+        if ($schoolId === 'all') {
+            return $report;
+        }
+
+        Validator::make(['school_id' => $schoolId], [
+            'school_id' => ['required', 'integer', 'exists:schools,id'],
+        ])->validate();
+
+        $report['schools'] = array_values(array_filter(
+            $report['schools'],
+            fn (array $entry): bool => (string) $entry['school']->id === $schoolId,
+        ));
+        $report['school_count'] = count($report['schools']);
+
+        return $report;
     }
 
     private function formType(string $form): string

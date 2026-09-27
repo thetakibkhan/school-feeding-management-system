@@ -10,6 +10,7 @@ use App\Models\SchoolMonthlyStockInput;
 use App\Models\SchoolStudentCount;
 use App\Models\StockReportPeriod;
 use App\Models\User;
+use App\Services\FormTwelveTemplate;
 use App\Services\StockReportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -107,28 +108,64 @@ class StockFormsTest extends TestCase
         $this->assertNull(StockReportPeriod::query()->where('form_type', 'form_12')->value('supplier_name'));
     }
 
+    public function test_form_twelve_received_and_distribution_years_share_reporting_year(): void
+    {
+        $years = app(FormTwelveTemplate::class)->reportingYears('2026-01');
+
+        $this->assertSame('২০২৬', $years['received_year']);
+        $this->assertSame('২০২৬', $years['distribution_year']);
+    }
+
+    public function test_form_twelve_information_screen_only_requests_month_and_school(): void
+    {
+        $this->school('AN-001', '91411060101', 'পরীক্ষা বিদ্যালয়');
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.reports.stock.information', ['form' => 12, 'month' => '2026-09']))
+            ->assertOk()
+            ->assertSee('name="month"', false)
+            ->assertSee('name="school_id"', false)
+            ->assertDontSee('name="bun_opening"', false)
+            ->assertDontSee('district_name', false);
+    }
+
+    public function test_form_twelve_missing_data_returns_error_before_form_preview(): void
+    {
+        $this->school('AN-001', '91411060101', 'পরীক্ষা বিদ্যালয়');
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.reports.stock.preview', ['form' => 12, 'month' => '2026-09', 'school_id' => 'all']))
+            ->assertRedirect(route('admin.reports.stock.information', ['form' => 12, 'month' => '2026-09', 'school_id' => 'all']))
+            ->assertSessionHasErrors();
+    }
+
     public function test_admin_can_save_reopen_and_preview_each_form(): void
     {
         $school = $this->school('AN-001', '91411060101', 'দীর্ঘ নামের সরকারি প্রাথমিক বিদ্যালয়');
         $admin = User::factory()->create(['role' => UserRole::Admin]);
 
+        SchoolStudentCount::query()->create(['school_id' => $school->id, 'student_count' => 1, 'effective_start_date' => '2026-09-01']);
+        SchoolMonthlyStockInput::query()->create(array_merge($this->zeroStock($school->id), ['boy_count' => 1, 'girl_count' => 0]));
+
         foreach (['12', '13'] as $form) {
             $this->actingAs($admin)->get(route('admin.reports.stock.information', ['form' => $form, 'month' => '2026-09']))->assertOk();
-            $this->put(route('admin.reports.stock.information.update', ['form' => $form]), [
-                'month' => '2026-09', 'district_name' => 'চট্টগ্রাম',
-                'upazila_name' => 'আনোয়ারা', 'supplier_name' => 'September supplier',
-            ])->assertRedirect();
-            $this->put(route('admin.reports.stock.schools.update', ['form' => $form, 'school' => $school]), $this->zeroStock($school->id))
-                ->assertRedirect();
+            if ($form === '13') {
+                $this->put(route('admin.reports.stock.information.update', ['form' => $form]), [
+                    'month' => '2026-09', 'district_name' => 'চট্টগ্রাম',
+                    'upazila_name' => 'আনোয়ারা', 'supplier_name' => 'September supplier',
+                ])->assertRedirect();
+            }
             $information = $this->get(route('admin.reports.stock.information', ['form' => $form, 'month' => '2026-09']))->assertOk();
             if ($form === '13') {
                 $information->assertSee('September supplier', false);
             }
-            $this->get(route('admin.reports.stock.preview', ['form' => $form, 'month' => '2026-09']))
+            $this->get(route('admin.reports.stock.preview', ['form' => $form, 'month' => '2026-09', 'school_id' => 'all']))
                 ->assertOk()->assertSee('official-page');
         }
 
-        $this->assertSame(2, StockReportPeriod::query()->where('month', '2026-09')->count());
+        $this->assertSame(1, StockReportPeriod::query()->where('month', '2026-09')->count());
         $this->assertSame(1, SchoolMonthlyStockInput::query()->where('month', '2026-09')->count());
     }
 

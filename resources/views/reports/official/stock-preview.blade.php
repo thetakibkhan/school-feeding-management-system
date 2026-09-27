@@ -8,10 +8,10 @@
 <body>
     <div class="report-toolbar">
         <strong>Official Form {{ $form }} · {{ $month }}</strong>
-        <a href="{{ route('admin.reports.stock.information', ['form' => $form, 'month' => $month]) }}">Report information</a>
+        <a href="{{ route('admin.reports.stock.information', ['form' => $form, 'month' => $month, 'school_id' => $schoolId]) }}">{{ $form === '12' ? 'Report selection' : 'Report information' }}</a>
         @if ($ready)
             <button type="button" onclick="window.print()">Print</button>
-            <a href="{{ route('admin.reports.stock.pdf', ['form' => $form, 'month' => $month]) }}">Download PDF</a>
+            <a href="{{ route('admin.reports.stock.pdf', ['form' => $form, 'month' => $month, 'school_id' => $schoolId]) }}">Download PDF</a>
         @else
             <span role="alert">Report information is incomplete. Preview leaves unknown values blank; finish the required school stock records before printing or downloading.</span>
         @endif

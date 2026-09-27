@@ -15,7 +15,8 @@ class FormTwelveTemplate
         $field = StockFormOverlay::field(...);
         $school = $page['school'];
         $input = $page['input'];
-        $month = 'মাস: '.$report['month_label'].'    সাল: '.FormSevenReportService::bengaliDigits(substr($report['month'], 0, 4));
+        $years = $this->reportingYears($report['month']);
+        $month = 'মাস: '.$report['month_label'].'    সাল: '.$years['received_year'];
         $fields = [
             $field(418, 155, 180, 26, $month, 15),
             $field(170, 198, 326, 32, $school->name, 15),
@@ -43,5 +44,16 @@ class FormTwelveTemplate
         }
 
         return $fields;
+    }
+
+    /** @return array{received_year: string, distribution_year: string} */
+    public function reportingYears(string $month): array
+    {
+        $reportingYear = FormSevenReportService::bengaliDigits(substr($month, 0, 4));
+
+        return [
+            'received_year' => $reportingYear,
+            'distribution_year' => $reportingYear,
+        ];
     }
 }

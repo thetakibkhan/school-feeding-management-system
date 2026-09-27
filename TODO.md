@@ -41,17 +41,21 @@
 
 ## Epic 5 Dashboard and Daily Delivery Report
 
-- [ ] Build shared daily demand-versus-delivery reporting.
-- [ ] Build the dashboard and shortfall list.
-- [ ] Build print and Excel export for the Daily Delivery Report.
-- [ ] Test missing-entry, holiday, unscheduled-item, shortfall, excess, and total behavior.
+- [x] Build shared daily demand-versus-delivery reporting.
+- [x] Build the dashboard and shortfall list.
+- [x] Build print and Excel-compatible CSV export for the Daily Delivery Report.
+- [x] Test missing-entry, holiday, unscheduled-item, shortfall, excess, and total behavior.
+- [ ] Visually review the operational Daily Delivery Report print layout.
 
 ## Epic 6 Official reports
 
-- [ ] Implement Forms 4, 7, 10, 12, and 13 as Blade report layouts.
-- [ ] Use mPDF with Noto Sans Bengali for printable PDF exports.
+- [x] Add a separate Admin-only Form 7 monthly preview using the supplied page artwork and mapped delivery quantities.
+- [x] Verify Form 7's six-page print output visually and test monthly totals, access, and the 110-school limit.
+- [ ] Sign off the overlaid Form 7 title and explanatory notes word-for-word against the supplied PDF; resolve fixed contractor/item-specification fields before official acceptance.
+- [ ] Verify each supplied form's exact static text and page structure, and preserve it in a form-specific immutable template.
+- [ ] Map structured data to Forms 4, 7, 10, 12, and 13 with deterministic form-specific renderers.
 - [ ] Derive Forms 12 and 13 from the delivery ledger without adding a separate inventory workflow.
-- [ ] Test calculations, Bangla output, total rows, and long-report pagination.
+- [ ] Compare same-size reference and generated PDF overlays; verify calculations, exact wording, signatures, and pagination.
 
 ## Submission readiness
 

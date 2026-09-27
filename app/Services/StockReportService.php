@@ -58,12 +58,18 @@ class StockReportService
                 $received = isset(self::DELIVERY_COLUMNS[$item])
                     ? ($missingDeliveryCount === 0 ? (int) $schoolDeliveries->sum(self::DELIVERY_COLUMNS[$item]) : null)
                     : $input?->{$item.'_received'};
+                $recordedReceived = isset(self::DELIVERY_COLUMNS[$item])
+                    ? ($schoolDeliveries->isNotEmpty()
+                        ? (int) $schoolDeliveries->sum(self::DELIVERY_COLUMNS[$item])
+                        : null)
+                    : $received;
                 $available = $opening === null || $received === null ? null : (int) $opening + (int) $received;
                 $closing = $available === null || $distributed === null ? null : $available - (int) $distributed;
                 if ($closing === null || $closing < 0) {
                     $complete = false;
                 }
-                $items[$item] = compact('opening', 'received', 'available', 'distributed', 'closing');
+                $items[$item] = compact('opening', 'received', 'available', 'distributed', 'closing')
+                    + ['recorded_received' => $recordedReceived];
             }
 
             if ($complete) {

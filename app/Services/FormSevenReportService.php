@@ -8,7 +8,10 @@ use Illuminate\Validation\ValidationException;
 
 class FormSevenReportService
 {
-    public function __construct(private readonly FormSevenReportRepository $reports) {}
+    public function __construct(
+        private readonly FormSevenReportRepository $reports,
+        private readonly StudentCountResolver $studentCounts,
+    ) {}
 
     private const MONTH_NAMES = [
         1 => 'জানুয়ারি', 2 => 'ফেব্রুয়ারি', 3 => 'মার্চ', 4 => 'এপ্রিল',
@@ -16,7 +19,7 @@ class FormSevenReportService
         9 => 'সেপ্টেম্বর', 10 => 'অক্টোবর', 11 => 'নভেম্বর', 12 => 'ডিসেম্বর',
     ];
 
-    /** @return array{month: string, month_label: string, rows: list<array<string, mixed>>, totals: array<string, array{chalans: int, quantity: int}>} */
+    /** @return array{month: string, month_label: string, supplier_name: ?string, rows: list<array<string, mixed>>, totals: array<string, array{chalans: int, quantity: int}>, missing_delivery_count: int, missing_reasons: list<string>} */
     public function forMonth(string $month): array
     {
         $start = Carbon::createFromFormat('!Y-m', $month)->startOfMonth();
@@ -32,7 +35,30 @@ class FormSevenReportService
         $deliveries = $this->reports
             ->deliveriesForMonth($start->toDateString(), $end->toDateString())
             ->groupBy('school_id');
+        $recordedDeliveryKeys = $deliveries
+            ->flatten(1)
+            ->mapWithKeys(static fn ($delivery): array => [
+                $delivery->date->toDateString().':'.$delivery->school_id => true,
+            ]);
+        $scheduledDates = $this->reports->scheduledDatesForMonth($start->toDateString(), $end->toDateString());
+        $missingDeliveryCount = 0;
 
+        foreach ($scheduledDates as $date) {
+            $effectiveCounts = $this->studentCounts->forSchoolsOnDate($schools->modelKeys(), $date);
+            $missingDeliveryCount += count(array_filter(
+                array_keys($effectiveCounts),
+                static fn (int|string $schoolId): bool => ! isset($recordedDeliveryKeys[$date.':'.$schoolId]),
+            ));
+        }
+
+        $missingReasons = [];
+        $supplierName = $this->reports->supplierNameForMonth($month);
+        if (blank($supplierName)) {
+            $missingReasons[] = 'Supplier/contractor name is not recorded for this month.';
+        }
+        if ($scheduledDates === []) {
+            $missingReasons[] = 'No working-date food schedule is configured for this month.';
+        }
         $totals = $this->emptyItems();
         $rows = [];
 
@@ -62,8 +88,11 @@ class FormSevenReportService
         return [
             'month' => $month,
             'month_label' => $monthLabel,
+            'supplier_name' => $supplierName,
             'rows' => $rows,
             'totals' => $totals,
+            'missing_delivery_count' => $missingDeliveryCount,
+            'missing_reasons' => $missingReasons,
         ];
     }
 

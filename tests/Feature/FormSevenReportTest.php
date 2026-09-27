@@ -6,10 +6,12 @@ use App\Enums\UserRole;
 use App\Models\Delivery;
 use App\Models\FoodItem;
 use App\Models\FoodSchedule;
+use App\Models\OfficialReportPeriod;
 use App\Models\School;
 use App\Models\SchoolStudentCount;
 use App\Models\User;
 use App\Services\FormSevenReportService;
+use Database\Seeders\OfficialReportPeriodSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -87,22 +89,64 @@ class FormSevenReportTest extends TestCase
             ->assertSessionHasErrors('month');
     }
 
-    public function test_pdf_download_is_blocked_when_a_scheduled_school_delivery_is_missing(): void
+    public function test_form_seven_warns_about_missing_entries_but_allows_pdf_download(): void
     {
         $school = $this->school('AN-001', '11111111111', 'প্রথম বিদ্যালয়');
         $this->scheduleBunFor($school, '2026-09-02');
+        OfficialReportPeriod::query()->create([
+            'month' => '2026-09',
+            'supplier_name' => 'স্বদেশ পল্লী লিমিটেড',
+        ]);
 
-        $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
+        $preview = app(FormSevenReportService::class)->forMonth('2026-09');
+        $this->assertSame(['chalans' => 0, 'quantity' => 0], $preview['totals']['bun']);
+        $this->assertSame(1, $preview['missing_delivery_count']);
+        $this->assertSame([], $preview['missing_reasons']);
+        $this->assertDatabaseCount('deliveries', 0);
+
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+        $this->actingAs($admin)
+            ->get('/admin/reports/form-7?month=2026-09')
+            ->assertOk()
+            ->assertSee('This report is generated from currently entered delivery records. Some scheduled deliveries have not yet been entered.')
+            ->assertSee('Print')
+            ->assertSee('Download PDF');
+
+        $this->actingAs($admin)
             ->get('/admin/reports/form-7/pdf?month=2026-09')
-            ->assertRedirect()
-            ->assertSessionHasErrors('month');
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/pdf');
+    }
+
+    public function test_september_supplier_seed_is_idempotent_and_preserves_admin_edits(): void
+    {
+        $this->seed(OfficialReportPeriodSeeder::class);
+
+        $period = OfficialReportPeriod::query()->where('month', '2026-09')->firstOrFail();
+        $this->assertSame('স্বদেশ পল্লী লিমিটেড', $period->supplier_name);
+
+        $period->update(['supplier_name' => 'Admin-edited supplier']);
+        $this->seed(OfficialReportPeriodSeeder::class);
+
+        $this->assertSame(
+            'Admin-edited supplier',
+            OfficialReportPeriod::query()->where('month', '2026-09')->value('supplier_name'),
+        );
     }
 
     public function test_admin_can_download_form_seven_pdf_from_complete_recorded_data(): void
     {
         $school = $this->school('AN-001', '11111111111', 'প্রথম বিদ্যালয়');
+        OfficialReportPeriod::query()->create([
+            'month' => '2026-09',
+            'supplier_name' => 'Verified September supplier',
+        ]);
         $this->scheduleBunFor($school, '2026-09-02');
         $this->delivery($school, User::factory()->create(['role' => UserRole::FieldStaff]), '2026-09-02', 90, 0, 0);
+
+        $preview = app(FormSevenReportService::class)->forMonth('2026-09');
+        $this->assertSame(0, $preview['missing_delivery_count']);
+        $this->assertSame(['chalans' => 0, 'quantity' => 0], $preview['totals']['egg']);
 
         $this->get('/admin/reports/form-7/pdf?month=2026-09')->assertRedirect('/login');
         $this->actingAs(User::factory()->create(['role' => UserRole::FieldStaff]))
@@ -114,7 +158,11 @@ class FormSevenReportTest extends TestCase
             ->assertOk()
             ->assertHeader('Content-Type', 'application/pdf');
 
-        $this->assertStringStartsWith('%PDF', $response->getContent());
+        $content = $response->getContent();
+        $this->assertIsString($content);
+        $pdfHeaderOffset = strpos($content, '%PDF-1.');
+        $this->assertNotFalse($pdfHeaderOffset);
+        $this->assertLessThan(1024, $pdfHeaderOffset);
     }
 
     private function scheduleBunFor(School $school, string $date): void

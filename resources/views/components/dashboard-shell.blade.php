@@ -1,4 +1,4 @@
-@props(['active' => 'Dashboard'])
+@props(['active' => 'Dashboard', 'displayDate' => null])
 
 <x-app-shell class="dashboard-shell" data-dashboard-shell>
     <div class="dashboard-shell__layout">
@@ -11,15 +11,10 @@
         </div>
 
         <nav class="dashboard-sidebar__nav">
-            <div class="dashboard-sidebar__label" data-sidebar-label>Quick actions</div>
-            <button class="dashboard-nav-item" type="button" data-sidebar-action="Search" title="Search"><span aria-hidden="true">⌕</span><span data-sidebar-label>Search</span></button>
-            <button class="dashboard-nav-item" type="button" data-sidebar-action="AI Assistant" title="AI Assistant"><span aria-hidden="true">✦</span><span data-sidebar-label>AI Assistant</span></button>
-            <button class="dashboard-nav-item" type="button" data-sidebar-action="Inbox" title="Inbox"><span aria-hidden="true">▣</span><span data-sidebar-label>Inbox</span><b class="dashboard-nav-badge" data-sidebar-label>4</b></button>
-
             <div class="dashboard-sidebar__label" data-sidebar-label>Workspaces</div>
             <a class="dashboard-nav-item {{ $active === 'Dashboard' ? 'is-active' : '' }}" href="{{ route('dashboard') }}" title="Dashboard"><span aria-hidden="true">⌂</span><span data-sidebar-label>Dashboard</span></a>
             @if (auth()->user()->isAdmin())
-                @php($administrationActive = in_array($active, ['Users', 'Schools', 'Demand setup'], true))
+                @php($administrationActive = in_array($active, ['Users', 'Schools', 'Demand setup', 'Official reports', 'Form 7'], true))
                 <button class="dashboard-nav-item dashboard-nav-item--expandable {{ $administrationActive ? 'is-active' : '' }}" type="button" data-sidebar-section="Administration" aria-expanded="{{ $administrationActive ? 'true' : 'false' }}" title="Administration">
                     <span aria-hidden="true">⚙</span><span data-sidebar-label>Administration</span><span class="dashboard-nav-chevron" data-sidebar-label>›</span>
                 </button>
@@ -27,14 +22,18 @@
                     <a href="{{ route('admin.users.index') }}" class="dashboard-submenu__item {{ $active === 'Users' ? 'is-active' : '' }}">Users</a>
                     <a href="{{ route('admin.schools.index') }}" class="dashboard-submenu__item {{ $active === 'Schools' ? 'is-active' : '' }}">Schools</a>
                     <a href="{{ route('admin.demand-setup.index') }}" class="dashboard-submenu__item {{ $active === 'Demand setup' ? 'is-active' : '' }}">Demand setup</a>
+                    <a href="{{ route('admin.reports.index') }}" class="dashboard-submenu__item {{ $active === 'Official reports' ? 'is-active' : '' }}">Official reports</a>
                 </div>
             @endif
-            <button class="dashboard-nav-item dashboard-nav-item--expandable" type="button" data-sidebar-section="Operations" aria-expanded="false" title="Operations">
+            @php($operationsActive = in_array($active, ['Daily report', 'My entries'], true))
+            <button class="dashboard-nav-item dashboard-nav-item--expandable {{ $operationsActive ? 'is-active' : '' }}" type="button" data-sidebar-section="Operations" aria-expanded="{{ $operationsActive ? 'true' : 'false' }}" title="Operations">
                 <span aria-hidden="true">▤</span><span data-sidebar-label>Operations</span><span class="dashboard-nav-chevron" data-sidebar-label>›</span>
             </button>
-            <div class="dashboard-submenu" data-sidebar-submenu="Operations">
-                <a href="#" class="dashboard-submenu__item">Daily report</a>
-                <a href="#" class="dashboard-submenu__item">My entries</a>
+            <div class="dashboard-submenu {{ $operationsActive ? 'is-open' : '' }}" data-sidebar-submenu="Operations">
+                <a href="{{ route('reports.daily-delivery.index') }}" class="dashboard-submenu__item {{ $active === 'Daily report' ? 'is-active' : '' }}">Daily report</a>
+                @unless (auth()->user()->isAdmin())
+                    <a href="{{ route('field-staff.deliveries.index') }}" class="dashboard-submenu__item {{ $active === 'My entries' ? 'is-active' : '' }}">My entries</a>
+                @endunless
             </div>
         </nav>
 
@@ -61,7 +60,7 @@
                 <p class="dashboard-eyebrow">School Feeding Management</p>
                 <h1>{{ $active }}</h1>
             </div>
-            <div class="dashboard-topbar__date">{{ now()->format('D, d M Y') }}</div>
+            <div class="dashboard-topbar__date">{{ $displayDate ?? now()->format('D, d M Y') }}</div>
         </header>
         <main class="dashboard-content">{{ $slot }}</main>
     </section>

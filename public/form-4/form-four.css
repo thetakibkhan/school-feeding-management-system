@@ -24,10 +24,10 @@
 }
 
 .form-four-warning {
-    border: 1px solid rgba(250, 204, 21, 0.35);
-    border-radius: 14px;
-    background: rgba(113, 63, 18, 0.2);
-    color: #fde68a;
+    border: 1px solid #e5c36a;
+    border-radius: 12px;
+    background: var(--ui-warning-soft, #fff5dc);
+    color: var(--ui-warning, #8a5a00);
     padding: 14px 18px;
 }
 
@@ -48,8 +48,9 @@
     margin: 0 auto;
     overflow: hidden;
     container-type: inline-size;
-    background: white;
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+    color-scheme: light;
+    background: #fff !important;
+    box-shadow: 0 1rem 3rem rgb(29 29 31 / 12%);
     break-after: page;
     page-break-after: always;
 }
@@ -68,8 +69,8 @@
     justify-content: center;
     overflow: hidden;
     box-sizing: border-box;
-    background: #fff;
-    color: #111;
+    background: #fff !important;
+    color: #111 !important;
     line-height: 1.4;
     white-space: nowrap;
 }
@@ -81,6 +82,17 @@
 
 .form-four-overlay--bordered {
     border: 0.1mm solid #000;
+}
+
+@media (max-width: 700px) {
+    .form-four-controls {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .form-four-controls form {
+        width: 100%;
+    }
 }
 
 @media print {

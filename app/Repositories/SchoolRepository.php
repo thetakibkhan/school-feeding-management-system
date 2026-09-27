@@ -4,16 +4,16 @@ namespace App\Repositories;
 
 use App\Models\School;
 use App\Models\SchoolStudentCount;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class SchoolRepository
 {
     /**
-     * @return Collection<int, School>
+     * @return LengthAwarePaginator<int, School>
      */
-    public function search(?string $search): Collection
+    public function search(?string $search): LengthAwarePaginator
     {
         return School::query()
             ->with(['studentCounts' => fn ($query) => $query->orderByDesc('effective_start_date')])
@@ -27,7 +27,8 @@ class SchoolRepository
                 });
             })
             ->orderBy('name')
-            ->get();
+            ->paginate(15)
+            ->withQueryString();
     }
 
     public function create(array $attributes): School

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Demand setup</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/ui.css', 'resources/js/app.js'])
 </head>
 <body>
     <x-dashboard-shell active="Demand setup">
@@ -13,7 +13,7 @@
                 <div>
                     <p class="dashboard-eyebrow">Administration</p>
                     <h2>Demand setup</h2>
-                    <p>Manage item specifications, non-working dates, and date-wise Bun, Egg, and Banana schedules.</p>
+                    <p>Manage non-working dates and date-wise Bun, Egg, and Banana schedules.</p>
                 </div>
             </div>
 
@@ -27,15 +27,7 @@
                 <div class="user-management__notice user-management__notice--error" role="alert">{{ $errors->first() }}</div>
             @endif
 
-            <div class="demand-setup__grid">
-                <section class="editable-table-card demand-setup__card">
-                    <div class="school-detail-card__heading"><div><p class="dashboard-eyebrow">Item specification</p><h3>Unit weights</h3><p>Weights describe each item; they do not multiply daily demand.</p></div></div>
-                    <div class="demand-setup__body">
-                        <table class="editable-table demand-setup__table"><thead><tr><th>Food item</th><th>Unit weight (grams)</th><th>Demand unit</th><th>Action</th></tr></thead><tbody>@foreach ($foodItems as $foodItem)<tr><td>{{ $foodItem->name }}</td><td><form class="demand-setup__spec-form" method="POST" action="{{ route('admin.demand-setup.items.specification.update', $foodItem) }}">@csrf @method('PUT')<input type="number" min="1" name="unit_weight_grams" value="{{ $foodItem->unit_weight_grams }}" aria-label="{{ $foodItem->name }} unit weight in grams" required><button type="submit">Save</button></form></td><td>{{ $foodItem->unit }}</td><td>Specification only</td></tr>@endforeach</tbody></table>
-                    </div>
-                </section>
-
-                <section class="editable-table-card demand-setup__card">
+            <section class="editable-table-card demand-setup__card">
                     <div class="school-detail-card__heading"><div><p class="dashboard-eyebrow">Calendar exception</p><h3>Non-working dates</h3></div></div>
                     <div class="demand-setup__body">
                         <form class="demand-setup__form" method="POST" action="{{ route('admin.demand-setup.non-working-dates.store') }}">
@@ -46,8 +38,7 @@
                         </form>
                         <table class="editable-table demand-setup__table"><thead><tr><th>Date</th><th>Reason</th><th>Action</th></tr></thead><tbody>@forelse ($nonWorkingDates as $nonWorkingDate)<tr><td>{{ $nonWorkingDate->date->format('d M Y') }}</td><td>{{ $nonWorkingDate->reason ?: '—' }}</td><td><form method="POST" action="{{ route('admin.demand-setup.non-working-dates.destroy', $nonWorkingDate) }}" onsubmit="return confirm('Remove this non-working date?');">@csrf @method('DELETE')<button class="demand-setup__link" type="submit">Remove</button></form></td></tr>@empty<tr><td colspan="3" class="editable-table-empty">No non-working dates in this range.</td></tr>@endforelse</tbody></table>
                     </div>
-                </section>
-            </div>
+            </section>
 
             <section class="editable-table-card demand-setup__card demand-setup__schedule-card">
                 <div class="school-detail-card__heading"><div><p class="dashboard-eyebrow">Date-wise plan</p><h3>Working schedules</h3></div><form class="demand-setup__filter" method="GET" action="{{ route('admin.demand-setup.index') }}"><input type="date" name="from" value="{{ $from }}" aria-label="From date"><input type="date" name="to" value="{{ $to }}" aria-label="To date"><button type="submit">Filter</button></form></div>

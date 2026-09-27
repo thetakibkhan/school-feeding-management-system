@@ -5,11 +5,13 @@ namespace Tests\Feature;
 use App\Enums\UserRole;
 use App\Models\Delivery;
 use App\Models\FoodSchedule;
+use App\Models\OfficialReportPeriod;
 use App\Models\School;
 use App\Models\SchoolMonthlyStockInput;
 use App\Models\SchoolStudentCount;
 use App\Models\StockReportPeriod;
 use App\Models\User;
+use App\Services\FormThirteenTemplate;
 use App\Services\FormTwelveTemplate;
 use App\Services\StockReportService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -130,15 +132,28 @@ class StockFormsTest extends TestCase
             ->assertDontSee('district_name', false);
     }
 
-    public function test_form_twelve_missing_data_returns_error_before_form_preview(): void
+    public function test_form_twelve_incomplete_data_still_previews_prints_and_downloads_without_fabricating_entries(): void
     {
         $this->school('AN-001', '91411060101', 'পরীক্ষা বিদ্যালয়');
         $admin = User::factory()->create(['role' => UserRole::Admin]);
 
-        $this->actingAs($admin)
+        $preview = $this->actingAs($admin)
             ->get(route('admin.reports.stock.preview', ['form' => 12, 'month' => '2026-09', 'school_id' => 'all']))
-            ->assertRedirect(route('admin.reports.stock.information', ['form' => 12, 'month' => '2026-09', 'school_id' => 'all']))
-            ->assertSessionHasErrors();
+            ->assertOk()
+            ->assertSee('official-page')
+            ->assertSee('window.print()')
+            ->assertSee('Download PDF')
+            ->assertSee('Some Form 12 data is missing');
+
+        $this->assertNotEmpty($preview->getContent());
+        $this->assertSame(0, Delivery::query()->count());
+
+        $pdf = $this->get(route('admin.reports.stock.pdf', ['form' => 12, 'month' => '2026-09', 'school_id' => 'all']))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+
+        $this->assertStringStartsWith('%PDF', $pdf->getContent());
+        $this->assertSame(0, Delivery::query()->count());
     }
 
     public function test_admin_can_save_reopen_and_preview_each_form(): void
@@ -169,22 +184,91 @@ class StockFormsTest extends TestCase
         $this->assertSame(1, SchoolMonthlyStockInput::query()->where('month', '2026-09')->count());
     }
 
-    public function test_missing_stock_blocks_final_pdf_and_field_staff_cannot_open_forms(): void
+    public function test_incomplete_form_thirteen_remains_printable_and_field_staff_cannot_open_forms(): void
     {
         $this->school('AN-001', '91411060101', 'পরীক্ষা বিদ্যালয়');
         $admin = User::factory()->create(['role' => UserRole::Admin]);
-        StockReportPeriod::query()->create([
-            'form_type' => 'form_13', 'month' => '2026-09',
-            'district_name' => 'চট্টগ্রাম', 'upazila_name' => 'আনোয়ারা', 'supplier_name' => 'Supplier',
-        ]);
 
         $this->actingAs($admin)->get(route('admin.reports.stock.preview', ['form' => 13, 'month' => '2026-09']))
-            ->assertOk()->assertSee('incomplete');
-        $this->get(route('admin.reports.stock.pdf', ['form' => 13, 'month' => '2026-09']))
-            ->assertSessionHasErrors('report');
+            ->assertOk()
+            ->assertSee('Some Form 13 data is incomplete')
+            ->assertSee('window.print()')
+            ->assertSee('Download PDF');
+        $pdf = $this->get(route('admin.reports.stock.pdf', ['form' => 13, 'month' => '2026-09']))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+        $this->assertStringStartsWith('%PDF', $pdf->getContent());
 
         $staff = User::factory()->create(['role' => UserRole::FieldStaff]);
         $this->actingAs($staff)->get(route('admin.reports.stock.information', ['form' => 13]))->assertForbidden();
+    }
+
+    public function test_form_thirteen_only_asks_for_missing_report_level_metadata(): void
+    {
+        $this->school('AN-001', '91411060101', 'পরীক্ষা বিদ্যালয়');
+        OfficialReportPeriod::query()->create([
+            'month' => '2026-09',
+            'supplier_name' => 'Configured supplier',
+        ]);
+        StockReportPeriod::query()->create([
+            'form_type' => 'form_12', 'month' => '2026-09',
+            'district_name' => 'চট্টগ্রাম', 'upazila_name' => 'আনোয়ারা',
+        ]);
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.reports.stock.information', ['form' => 13, 'month' => '2026-09']))
+            ->assertOk()
+            ->assertSee('Configured supplier')
+            ->assertSee('name="month"', false)
+            ->assertDontSee('name="district_name"', false)
+            ->assertDontSee('name="upazila_name"', false)
+            ->assertDontSee('name="supplier_name"', false)
+            ->assertDontSee('School stock inputs')
+            ->assertDontSee('name="bun_opening"', false)
+            ->assertDontSee('name="bun_distributed"', false);
+
+        $this->actingAs($admin)
+            ->get(route('admin.reports.stock.information', ['form' => 13, 'month' => '2026-10']))
+            ->assertOk()
+            ->assertDontSee('name="district_name"', false)
+            ->assertDontSee('name="upazila_name"', false)
+            ->assertSee('name="supplier_name"', false);
+
+        StockReportPeriod::query()->delete();
+        OfficialReportPeriod::query()->delete();
+        $this->actingAs($admin)
+            ->get(route('admin.reports.stock.information', ['form' => 13, 'month' => '2026-11']))
+            ->assertOk()
+            ->assertSee('name="district_name" value=""', false)
+            ->assertSee('name="upazila_name" value=""', false)
+            ->assertSee('name="supplier_name" value=""', false);
+    }
+
+    public function test_form_thirteen_totals_include_known_school_values_when_other_school_values_are_missing(): void
+    {
+        $recordedSchool = $this->school('AN-001', '91411060101', 'প্রথম বিদ্যালয়');
+        $missingSchool = $this->school('AN-002', '91411060102', 'দ্বিতীয় বিদ্যালয়');
+        FoodSchedule::query()->create(['date' => '2026-09-02']);
+        $this->delivery($recordedSchool, 10, 4, 2);
+        SchoolMonthlyStockInput::query()->create(array_merge($this->zeroStock($recordedSchool->id), [
+            'bun_opening' => 3, 'bun_distributed' => 8,
+            'egg_distributed' => 4,
+            'banana_opening' => 2, 'banana_distributed' => 3,
+        ]));
+
+        $report = app(StockReportService::class)->forMonth('2026-09');
+        $period = new StockReportPeriod([
+            'district_name' => null,
+            'upazila_name' => null,
+            'supplier_name' => null,
+        ]);
+        $pages = app(FormThirteenTemplate::class)->pages($report, $period);
+
+        $this->assertSame(2, $report['school_count']);
+        $this->assertSame(['১৩', '৮', '৫', '৪', '৪', '০', '৪', '৩', '১'], array_column($pages[4]['overlays'], 'text'));
+        $this->assertNull($report['schools'][1]['items']['bun']['received']);
+        $this->assertSame($missingSchool->id, $report['schools'][1]['school']->id);
     }
 
     public function test_form_thirteen_needs_only_its_three_food_items(): void

@@ -13,11 +13,23 @@ class DemandCalculator
 
     public function forSchoolDateItem(School $school, string $date, FoodItem $foodItem): DemandCalculation
     {
-        if ($this->isNonWorkingDate($date) || ! $this->isScheduled($date, $foodItem)) {
+        $nonWorkingDate = $this->isNonWorkingDate($date);
+        $scheduled = ! $nonWorkingDate && $this->isScheduled($date, $foodItem);
+        $studentCount = $scheduled ? $this->studentCounts->forDate($school, $date) : null;
+
+        return $this->forResolvedInputs($studentCount, $nonWorkingDate, $scheduled, $foodItem);
+    }
+
+    public function forResolvedInputs(
+        ?int $studentCount,
+        bool $nonWorkingDate,
+        bool $scheduled,
+        FoodItem $foodItem,
+    ): DemandCalculation {
+        if ($nonWorkingDate || ! $scheduled) {
             return new DemandCalculation(0, null, null);
         }
 
-        $studentCount = $this->studentCounts->forDate($school, $date);
         if ($studentCount === null) {
             return new DemandCalculation(0, null, $foodItem->unit_weight_grams);
         }

@@ -14,6 +14,7 @@ return [
     */
 
     'default' => env('FILESYSTEM_DISK', 'local'),
+    'delivery_photos_disk' => env('DELIVERY_PHOTOS_DISK', 'cloudinary'),
 
     /*
     |--------------------------------------------------------------------------
@@ -35,6 +36,14 @@ return [
             'root' => storage_path('app/private'),
             'serve' => true,
             'throw' => false,
+            'report' => false,
+        ],
+
+        'delivery_photos' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/delivery-photos'),
+            'serve' => false,
+            'throw' => true,
             'report' => false,
         ],
 

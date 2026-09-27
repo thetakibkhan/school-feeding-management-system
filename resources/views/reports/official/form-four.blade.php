@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Official Form 4 — {{ $report['month'] }}</title>
     @vite(['resources/css/app.css', 'resources/css/ui.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="{{ asset('form-4/form-four.css') }}">
+    <link rel="stylesheet" href="{{ asset('form-4/form-four.css') }}?v={{ filemtime(public_path('form-4/form-four.css')) }}">
 </head>
 <body class="form-four-screen">
 <x-app-shell>
@@ -21,7 +21,6 @@
                 <input id="form-four-month" name="month" type="month" value="{{ $report['month'] }}" required>
                 <button type="submit">Show</button>
                 <button type="button" onclick="window.print()">Print all</button>
-                <a href="{{ route('admin.reports.form-four.pdf', ['month' => $report['month']]) }}" class="form-seven-back">Download PDF</a>
             </form>
         </header>
 

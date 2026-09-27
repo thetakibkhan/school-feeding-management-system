@@ -7,15 +7,66 @@ use App\Models\School;
 use App\Models\SchoolStudentCount;
 use App\Models\User;
 use App\Services\StudentCountResolver;
+use Database\Seeders\AnwaraSchoolSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Tests\TestCase;
 
 class SchoolManagementTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_anwara_school_seeder_uses_fixed_school_codes_and_real_emis_codes(): void
+    {
+        $this->seed(AnwaraSchoolSeeder::class);
+
+        $this->assertSame(110, School::query()->count());
+        $this->assertDatabaseHas('schools', [
+            'school_code' => 'AN-001',
+            'emis_code' => '91411060101',
+            'name' => 'বৈরাগ সপ্রাবি',
+        ]);
+        $this->assertDatabaseHas('schools', [
+            'school_code' => 'AN-052',
+            'emis_code' => '91411060701',
+            'name' => 'আনোয়ারা মডেল সপ্রাবি',
+        ]);
+        $this->assertDatabaseHas('schools', [
+            'school_code' => 'AN-110',
+            'emis_code' => '99411069003',
+            'name' => 'মাহাতা পাটানিকোঠা সপ্রাবি',
+        ]);
+        $this->assertDatabaseHas('school_student_counts', [
+            'student_count' => 191,
+            'effective_start_date' => '2026-09-01 00:00:00',
+        ]);
+        $this->assertDatabaseHas('schools', [
+            'school_code' => 'AN-001',
+            'principal_name' => 'মোঃ গোলাম জিলানী',
+        ]);
+    }
+
+    public function test_school_list_shows_principal_contact_and_90_percent_counts(): void
+    {
+        $school = $this->school([
+            'name' => 'পরীক্ষা বিদ্যালয়',
+            'principal_name' => 'মোঃ পরীক্ষা প্রধান',
+            'principal_mobile' => '01812345678',
+        ]);
+        SchoolStudentCount::query()->create([
+            'school_id' => $school->id,
+            'student_count' => 191,
+            'effective_start_date' => '2026-09-01',
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get('/admin/schools')
+            ->assertOk()
+            ->assertSee('মোঃ পরীক্ষা প্রধান')
+            ->assertSee('01812345678')
+            ->assertSee('171.9')
+            ->assertSee('172');
+    }
 
     public function test_admin_can_create_a_school_with_its_initial_effective_student_count(): void
     {
@@ -96,6 +147,8 @@ class SchoolManagementTest extends TestCase
             'school_code' => 'ANW-UPDATED',
             'emis_code' => 'EMIS-UPDATED',
             'name' => 'আপডেট করা বিদ্যালয়',
+            'principal_name' => 'মোঃ নতুন প্রধান',
+            'principal_mobile' => '01812345678',
         ])->assertRedirect('/admin/schools/'.$school->id);
 
         $this->assertDatabaseHas('schools', [
@@ -103,6 +156,8 @@ class SchoolManagementTest extends TestCase
             'school_code' => 'ANW-UPDATED',
             'emis_code' => 'EMIS-UPDATED',
             'name' => 'আপডেট করা বিদ্যালয়',
+            'principal_name' => 'মোঃ নতুন প্রধান',
+            'principal_mobile' => '01812345678',
         ]);
     }
 
@@ -146,6 +201,21 @@ class SchoolManagementTest extends TestCase
             ->assertDontSee('বাঁশখালী সরকারি প্রাথমিক বিদ্যালয়');
     }
 
+    public function test_school_names_use_the_dedicated_bangla_typography_class(): void
+    {
+        $school = $this->school(['name' => 'বাংলা বিদ্যালয়']);
+
+        $this->actingAs($this->admin())
+            ->get('/admin/schools')
+            ->assertOk()
+            ->assertSee('class="font-bangla"', false);
+
+        $this->actingAs($this->admin())
+            ->get('/admin/schools/'.$school->id)
+            ->assertOk()
+            ->assertSee('class="font-bangla"', false);
+    }
+
     public function test_unused_school_deletion_removes_its_student_count_history(): void
     {
         $school = $this->school();
@@ -165,13 +235,13 @@ class SchoolManagementTest extends TestCase
     public function test_school_deletion_is_blocked_when_delivery_history_references_the_school(): void
     {
         $school = $this->school();
-        Schema::create('deliveries', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('school_id')->constrained()->restrictOnDelete();
-            $table->timestamps();
-        });
+        $fieldStaff = User::factory()->create(['role' => UserRole::FieldStaff]);
         DB::table('deliveries')->insert([
             'school_id' => $school->id,
+            'date' => '2026-09-01',
+            'chalan_disk' => 'local',
+            'chalan_path' => 'test-chalan.jpg',
+            'created_by_user_id' => $fieldStaff->id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -181,8 +251,6 @@ class SchoolManagementTest extends TestCase
         $response->assertRedirect('/admin/schools');
         $response->assertSessionHas('error');
         $this->assertDatabaseHas('schools', ['id' => $school->id]);
-
-        Schema::dropIfExists('deliveries');
     }
 
     public function test_field_staff_cannot_manage_schools(): void
@@ -198,7 +266,7 @@ class SchoolManagementTest extends TestCase
     }
 
     /**
-     * @param array{school_code?: string, emis_code?: string, name?: string} $attributes
+     * @param  array{school_code?: string, emis_code?: string, name?: string, principal_name?: string, principal_mobile?: string}  $attributes
      */
     private function school(array $attributes = []): School
     {
@@ -206,6 +274,8 @@ class SchoolManagementTest extends TestCase
             'school_code' => $attributes['school_code'] ?? 'SC-'.fake()->unique()->numerify('###'),
             'emis_code' => $attributes['emis_code'] ?? 'EMIS-'.fake()->unique()->numerify('#####'),
             'name' => $attributes['name'] ?? 'পরীক্ষা বিদ্যালয়',
+            'principal_name' => $attributes['principal_name'] ?? null,
+            'principal_mobile' => $attributes['principal_mobile'] ?? null,
         ]);
     }
 }

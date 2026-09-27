@@ -10,6 +10,7 @@ use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 use Illuminate\View\View;
 
 class SchoolManagementController extends Controller
@@ -43,6 +44,8 @@ class SchoolManagementController extends Controller
             $data['name'],
             $data['student_count'],
             $data['effective_start_date'],
+            $data['principal_name'] ?? null,
+            $data['principal_mobile'] ?? null,
         );
 
         return to_route('admin.schools.index')->with('status', 'School created.');
@@ -54,9 +57,18 @@ class SchoolManagementController extends Controller
             'school_code' => ['required', 'string', 'max:100', Rule::unique('schools', 'school_code')->ignore($school)],
             'emis_code' => ['required', 'string', 'max:100', Rule::unique('schools', 'emis_code')->ignore($school)],
             'name' => ['required', 'string', 'max:255'],
+            'principal_name' => ['nullable', 'string', 'max:255'],
+            'principal_mobile' => ['nullable', 'string', 'max:32'],
         ]);
 
-        $this->schools->updateSchool($school, $data['school_code'], $data['emis_code'], $data['name']);
+        $this->schools->updateSchool(
+            $school,
+            $data['school_code'],
+            $data['emis_code'],
+            $data['name'],
+            $data['principal_name'] ?? null,
+            $data['principal_mobile'] ?? null,
+        );
 
         return to_route('admin.schools.show', $school)->with('status', 'School updated.');
     }
@@ -97,7 +109,7 @@ class SchoolManagementController extends Controller
     }
 
     /**
-     * @return array<string, array<int, string|\Illuminate\Validation\Rules\Unique>>
+     * @return array<string, array<int, string|Unique>>
      */
     private function schoolCreationRules(): array
     {
@@ -105,6 +117,8 @@ class SchoolManagementController extends Controller
             'school_code' => ['required', 'string', 'max:100', 'unique:schools,school_code'],
             'emis_code' => ['required', 'string', 'max:100', 'unique:schools,emis_code'],
             'name' => ['required', 'string', 'max:255'],
+            'principal_name' => ['nullable', 'string', 'max:255'],
+            'principal_mobile' => ['nullable', 'string', 'max:32'],
             'student_count' => ['required', 'integer', 'min:1'],
             'effective_start_date' => ['required', 'date'],
         ];

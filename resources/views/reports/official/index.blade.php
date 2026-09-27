@@ -20,10 +20,6 @@
             @if ($errors->any())
                 <div class="user-management__notice user-management__notice--error" role="alert">{{ $errors->first() }}</div>
             @endif
-            @if (session('status'))
-                <div class="user-management__notice" role="status">{{ session('status') }}</div>
-            @endif
-
             <section class="editable-table-card demand-setup__card">
                 <div class="school-detail-card__heading">
                     <div>
@@ -37,30 +33,6 @@
                     </form>
                 </div>
                 <div class="demand-setup__body">
-                    <form method="POST" action="{{ route('admin.reports.period.update') }}" class="demand-setup__filter" style="padding:16px 0">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="month" value="{{ $month }}">
-                        <label for="supplier-name">Supplier/contractor for {{ $month }}</label>
-                        <input id="supplier-name" name="supplier_name" type="text" value="{{ old('supplier_name', $period->supplier_name) }}" maxlength="255" required>
-                        <label for="invoice-number">Invoice number</label>
-                        <input id="invoice-number" name="invoice_number" type="text" value="{{ old('invoice_number', $period->invoice_number) }}" maxlength="100">
-                        <label for="invoice-date">Invoice date</label>
-                        <input id="invoice-date" name="invoice_date" type="date" value="{{ old('invoice_date', $period->invoice_date?->format('Y-m-d')) }}">
-                        <label for="contract-number">Contract number</label>
-                        <input id="contract-number" name="contract_number" type="text" value="{{ old('contract_number', $period->contract_number) }}" maxlength="150">
-                        <label for="bank-account-name">Bank account name</label>
-                        <input id="bank-account-name" name="bank_account_name" type="text" value="{{ old('bank_account_name', $period->bank_account_name) }}" maxlength="255">
-                        <label for="bank-account-number">Bank account number</label>
-                        <input id="bank-account-number" name="bank_account_number" type="text" value="{{ old('bank_account_number', $period->bank_account_number) }}" maxlength="100">
-                        <label for="bank-name">Bank name</label>
-                        <input id="bank-name" name="bank_name" type="text" value="{{ old('bank_name', $period->bank_name) }}" maxlength="255">
-                        <label for="bank-branch">Bank branch</label>
-                        <input id="bank-branch" name="bank_branch" type="text" value="{{ old('bank_branch', $period->bank_branch) }}" maxlength="255">
-                        <label for="bank-routing-number">Bank routing number</label>
-                        <input id="bank-routing-number" name="bank_routing_number" type="text" value="{{ old('bank_routing_number', $period->bank_routing_number) }}" maxlength="100">
-                        <button type="submit">Save period details</button>
-                    </form>
                     <table class="editable-table">
                         <thead><tr><th>Official form</th><th>Purpose</th><th>Action</th></tr></thead>
                         <tbody>

@@ -21,12 +21,12 @@ class DemandSetupSeeder extends Seeder
     ];
 
     /**
-     * @var array<string, array{name: string, unit: string, unit_weight_grams: int}>
+     * @var array<string, array{name: string, unit: string, unit_weight_grams: int, unit_price: string}>
      */
     private const FOOD_ITEMS = [
-        'bun' => ['name' => 'Bun', 'unit' => 'packets', 'unit_weight_grams' => 120],
-        'boiled_egg' => ['name' => 'Boiled Egg', 'unit' => 'pieces', 'unit_weight_grams' => 60],
-        'banana' => ['name' => 'Banana', 'unit' => 'pieces', 'unit_weight_grams' => 100],
+        'bun' => ['name' => 'Bun', 'unit' => 'packets', 'unit_weight_grams' => 120, 'unit_price' => '22.883'],
+        'boiled_egg' => ['name' => 'Boiled Egg', 'unit' => 'pieces', 'unit_weight_grams' => 60, 'unit_price' => '13.543'],
+        'banana' => ['name' => 'Banana', 'unit' => 'pieces', 'unit_weight_grams' => 100, 'unit_price' => '9.807'],
     ];
 
     /**
@@ -82,6 +82,9 @@ class DemandSetupSeeder extends Seeder
                     'unit_weight_grams' => $attributes['unit_weight_grams'],
                 ],
             );
+            if ($items[$key]->unit_price === null) {
+                $items[$key]->forceFill(['unit_price' => $attributes['unit_price']])->save();
+            }
         }
 
         return $items;

@@ -29,7 +29,7 @@ class StockFormController extends Controller
     public function information(Request $request, string $form): View
     {
         $month = $this->month($request);
-        $type = $this->formType($form);
+        $this->formType($form);
         if ($form === '12') {
             $schools = School::query()->orderBy('school_code')->get(['id', 'school_code', 'name']);
             $schoolId = (string) $request->query('school_id', 'all');
@@ -37,13 +37,11 @@ class StockFormController extends Controller
             return view('reports.official.form-twelve-select', compact('month', 'schools', 'schoolId'));
         }
 
-        $report = $this->reports->forMonth($month);
-        $completedCount = count(array_filter($report['schools'], fn (array $school): bool => $this->readySchool($form, $school)));
-        $period = StockReportPeriod::query()->where('form_type', $type)->where('month', $month)->first();
-        $selected = collect($report['schools'])->firstWhere('school.id', (int) $request->query('school_id')) ?? ($report['schools'][0] ?? null);
-        $supplier = OfficialReportPeriod::query()->where('month', $month)->value('supplier_name');
+        $period = $this->formThirteenPeriod($month);
+        $missingMetadata = $this->missingFormThirteenMetadata($period);
+        $schoolCount = School::query()->count();
 
-        return view('reports.official.stock-information', compact('form', 'month', 'report', 'period', 'selected', 'supplier', 'completedCount'));
+        return view('reports.official.form-thirteen-information', compact('form', 'month', 'period', 'missingMetadata', 'schoolCount'));
     }
 
     public function savePeriod(Request $request, string $form): RedirectResponse
@@ -52,19 +50,25 @@ class StockFormController extends Controller
             return to_route('admin.reports.stock.information', ['form' => $form, 'month' => $this->month($request)]);
         }
         $type = $this->formType($form);
-        $data = $request->validate([
+        $month = $request->validate([
             'month' => ['required', 'date_format:Y-m'],
-            'district_name' => ['required', 'string', 'max:255'],
-            'upazila_name' => ['required', 'string', 'max:255'],
-            'supplier_name' => [$form === '13' ? 'required' : 'nullable', 'string', 'max:255'],
-        ]);
+        ])['month'];
+        $period = $this->formThirteenPeriod($month);
+        $rules = ['month' => ['required', 'date_format:Y-m']];
+        foreach (array_keys($this->missingFormThirteenMetadata($period)) as $field) {
+            $rules[$field] = ['required', 'string', 'max:255'];
+        }
+        $data = $request->validate($rules);
+        $metadata = [];
+        foreach (['district_name', 'upazila_name', 'supplier_name'] as $field) {
+            $metadata[$field] = filled($period->{$field}) ? $period->{$field} : ($data[$field] ?? null);
+        }
         StockReportPeriod::query()->updateOrCreate(
-            ['form_type' => $type, 'month' => $data['month']],
-            ['district_name' => $data['district_name'], 'upazila_name' => $data['upazila_name'],
-                'supplier_name' => $form === '13' ? $data['supplier_name'] : null],
+            ['form_type' => $type, 'month' => $month],
+            $metadata,
         );
 
-        return to_route('admin.reports.stock.information', ['form' => $form, 'month' => $data['month']])
+        return to_route('admin.reports.stock.information', ['form' => $form, 'month' => $month])
             ->with('status', 'Report information saved.');
     }
 
@@ -105,29 +109,27 @@ class StockFormController extends Controller
         if ($form === '12') {
             $schoolId = (string) $request->query('school_id', 'all');
             $report = $this->selectedSchoolReport($this->reports->forMonth($month), $schoolId);
-            if (! $this->ready($form, $report)) {
+            if ($report['school_count'] === 0) {
                 return to_route('admin.reports.stock.information', ['form' => $form, 'month' => $month, 'school_id' => $schoolId])
-                    ->withErrors('Required Form 12 data is missing for the selected school or month.');
+                    ->withErrors('No schools are available for this Form 12 report.');
             }
             $period = StockReportPeriod::query()->where('form_type', $type)->where('month', $month)->first()
                 ?? new StockReportPeriod(['district_name' => 'চট্টগ্রাম', 'upazila_name' => 'আনোয়ারা']);
             $pages = $this->pages($form, $report, $period);
-            $ready = true;
+            $ready = $this->ready($form, $report);
+            $missingDeliveryCount = array_sum(array_column($report['schools'], 'missing_delivery_count'));
 
-            return view('reports.official.stock-preview', compact('form', 'month', 'report', 'pages', 'ready', 'schoolId'));
+            return view('reports.official.stock-preview', compact('form', 'month', 'report', 'pages', 'ready', 'schoolId', 'missingDeliveryCount'));
         }
 
-        $period = StockReportPeriod::query()->where('form_type', $type)->where('month', $month)->first();
-        if (! $period) {
-            return to_route('admin.reports.stock.information', ['form' => $form, 'month' => $month])
-                ->withErrors('Save report information before opening the preview.');
-        }
+        $period = $this->formThirteenPeriod($month);
         $report = $this->reports->forMonth($month);
         $pages = $this->pages($form, $report, $period);
-        $ready = $this->ready($form, $report);
+        $ready = $this->ready($form, $report) && $this->missingFormThirteenMetadata($period) === [];
+        $missingDeliveryCount = array_sum(array_column($report['schools'], 'missing_delivery_count'));
         $schoolId = 'all';
 
-        return view('reports.official.stock-preview', compact('form', 'month', 'report', 'pages', 'ready', 'schoolId'));
+        return view('reports.official.stock-preview', compact('form', 'month', 'report', 'pages', 'ready', 'schoolId', 'missingDeliveryCount'));
     }
 
     public function pdf(Request $request, string $form): Response
@@ -141,9 +143,9 @@ class StockFormController extends Controller
             $period = StockReportPeriod::query()->where('form_type', $type)->where('month', $month)->first()
                 ?? new StockReportPeriod(['district_name' => 'চট্টগ্রাম', 'upazila_name' => 'আনোয়ারা']);
         } else {
-            $period = StockReportPeriod::query()->where('form_type', $type)->where('month', $month)->first();
+            $period = $this->formThirteenPeriod($month);
         }
-        if (! $period || ! $this->ready($form, $report)) {
+        if (! $period || ($form === '12' && $report['school_count'] === 0)) {
             throw ValidationException::withMessages(['report' => 'Save all required report and school stock information before downloading the official PDF.']);
         }
 
@@ -200,6 +202,9 @@ class StockFormController extends Controller
         }
         $items = $form === '12' ? ['milk', 'biscuit', 'bun', 'egg', 'banana'] : ['bun', 'egg', 'banana'];
         foreach ($items as $item) {
+            if ($form === '13' && $school['items'][$item]['recorded_received'] === null) {
+                return false;
+            }
             if ($school['items'][$item]['closing'] === null || $school['items'][$item]['closing'] < 0) {
                 return false;
             }
@@ -243,5 +248,40 @@ class StockFormController extends Controller
         abort_unless(in_array($form, ['12', '13'], true), 404);
 
         return 'form_'.$form;
+    }
+
+    private function formThirteenPeriod(string $month): StockReportPeriod
+    {
+        $periods = StockReportPeriod::query()
+            ->where('month', $month)
+            ->orderByRaw("CASE WHEN form_type = 'form_13' THEN 0 ELSE 1 END")
+            ->get();
+        $storedSupplier = $periods->first(fn (StockReportPeriod $period): bool => filled($period->supplier_name))?->supplier_name;
+        $supplier = OfficialReportPeriod::query()->where('month', $month)->value('supplier_name');
+
+        return new StockReportPeriod([
+            'form_type' => 'form_13',
+            'month' => $month,
+            'district_name' => $periods->first(fn (StockReportPeriod $period): bool => filled($period->district_name))?->district_name,
+            'upazila_name' => $periods->first(fn (StockReportPeriod $period): bool => filled($period->upazila_name))?->upazila_name,
+            'supplier_name' => $supplier ?: $storedSupplier,
+        ]);
+    }
+
+    /** @return array<string, string> */
+    private function missingFormThirteenMetadata(StockReportPeriod $period): array
+    {
+        $missing = [];
+        foreach ([
+            'district_name' => 'District',
+            'upazila_name' => 'Upazila',
+            'supplier_name' => 'Supplier/contractor',
+        ] as $field => $label) {
+            if (blank($period->{$field})) {
+                $missing[$field] = $label;
+            }
+        }
+
+        return $missing;
     }
 }

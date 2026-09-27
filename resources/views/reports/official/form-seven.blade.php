@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>নমুনা ফরম-০৭ — {{ $form['month_label'] }}</title>
     @vite(['resources/css/app.css', 'resources/css/ui.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="{{ asset('form-7/form-seven.css') }}">
+    <link rel="stylesheet" href="{{ asset('form-7/form-seven.css') }}?v={{ filemtime(public_path('form-7/form-seven.css')) }}">
 </head>
 <body class="form-seven-screen">
 <x-app-shell>
@@ -20,9 +20,34 @@
                 <label for="form-seven-month">Month</label>
                 <input id="form-seven-month" name="month" type="month" value="{{ $form['month'] }}" required>
                 <button type="submit">Show</button>
-                <button type="button" onclick="window.print()">Print / Save PDF</button>
+                @if ($form['missing_reasons'] === [])
+                    <button type="button" onclick="window.print()">Print</button>
+                @endif
             </form>
         </div>
+
+        @if ($form['missing_reasons'] !== [])
+            <div class="form-seven-controls" role="status">
+                <div>
+                    <h2>Required report setup is incomplete — printing is unavailable</h2>
+                    <ul>
+                        @foreach ($form['missing_reasons'] as $reason)
+                            <li>{{ $reason }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
+
+        @if ($form['missing_delivery_count'] > 0)
+            <div class="form-seven-controls" role="status">
+                <div>
+                    <h2>Preview uses currently entered delivery records</h2>
+                    <p>This report is generated from currently entered delivery records. Some scheduled deliveries have not yet been entered.</p>
+                    <p>{{ number_format($form['missing_delivery_count']) }} expected school/date delivery records are missing. Missing records contribute zero to this preview and are not counted as challans.</p>
+                </div>
+            </div>
+        @endif
 
         @php
             // Coordinates are measured from the supplied A4 PDF rendered at 130 DPI.
@@ -51,6 +76,7 @@
                         <div class="form-seven-title-replacement">
                             {{ $form['month_label'] }} মাসের বনরুটি (১২০ গ্রাম), সিদ্ধ ডিম (৬০ গ্রাম) ও কলা (১০০ গ্রাম) বিদ্যালয় পর্যায়ে সরবরাহের বিবরণী
                         </div>
+                        <div class="form-seven-supplier-replacement" style="{{ $position(291, 420, 448, 478) }}">{{ $form['supplier_name'] }}</div>
                     @endif
 
                     @if ($page <= 5)

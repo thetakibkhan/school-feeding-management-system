@@ -1,9 +1,36 @@
-import '../css/beams-background.css';
-import '../css/auth.css';
-import '../css/dashboard.css';
-import '../css/table.css';
-import '../css/modal.css';
 import { mountBeamsBackground } from './beams-background';
+
+const themeToggleButtons = document.querySelectorAll('[data-theme-toggle]');
+const setTheme = (theme, persist = false) => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+
+    themeToggleButtons.forEach((button) => {
+        const nextTheme = theme === 'dark' ? 'light' : 'dark';
+        const label = `Switch to ${nextTheme} mode`;
+        button.setAttribute('aria-label', label);
+        button.setAttribute('title', label);
+        const icon = button.querySelector('[data-theme-icon]');
+        if (icon) icon.textContent = nextTheme === 'dark' ? '☾' : '☀';
+    });
+
+    if (persist) {
+        try {
+            localStorage.setItem('prottyashi-theme', theme);
+        } catch {
+            // Keep the selected theme active for the current page if storage is unavailable.
+        }
+    }
+};
+
+const currentTheme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+setTheme(currentTheme);
+themeToggleButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+        const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        setTheme(nextTheme, true);
+    });
+});
 
 const dashboardShell = document.querySelector('[data-dashboard-shell]');
 if (dashboardShell) {
@@ -22,12 +49,6 @@ if (dashboardShell) {
             const open = section.getAttribute('aria-expanded') === 'true';
             section.setAttribute('aria-expanded', String(!open));
             submenu?.classList.toggle('is-open', !open);
-        });
-    });
-    dashboardShell.querySelectorAll('[data-sidebar-action]').forEach((action) => {
-        action.addEventListener('click', () => {
-            dashboardShell.querySelectorAll('[data-sidebar-action]').forEach((item) => item.classList.remove('is-active'));
-            action.classList.add('is-active');
         });
     });
     dashboardShell.querySelector('[data-sidebar-open]')?.addEventListener('click', () => setMobileOpen(true));
@@ -107,6 +128,8 @@ document.querySelectorAll('[data-edit-school]').forEach((button) => {
         form.querySelector('[name="name"]').value = button.dataset.name || '';
         form.querySelector('[name="school_code"]').value = button.dataset.schoolCode || '';
         form.querySelector('[name="emis_code"]').value = button.dataset.emisCode || '';
+        form.querySelector('[name="principal_name"]').value = button.dataset.principalName || '';
+        form.querySelector('[name="principal_mobile"]').value = button.dataset.principalMobile || '';
         modal.hidden = false;
         form.querySelector('[name="name"]').focus();
     });
@@ -117,3 +140,34 @@ document.querySelectorAll('[data-modal-close]').forEach((button) => {
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') document.querySelectorAll('[data-modal]:not([hidden])').forEach((modal) => modal.setAttribute('hidden', ''));
 });
+
+document.querySelectorAll('[data-photo-modal]').forEach((modal) => {
+    const image = modal.querySelector('[data-photo-modal-image]');
+    const error = modal.querySelector('[data-photo-modal-error]');
+
+    document.querySelectorAll('[data-photo-open]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (!(image instanceof HTMLImageElement) || !(modal instanceof HTMLDialogElement)) return;
+
+            error.hidden = true;
+            image.hidden = false;
+            image.src = link.href;
+            modal.showModal();
+        });
+    });
+
+    image?.addEventListener('error', () => {
+        image.hidden = true;
+        error.hidden = false;
+    });
+    modal.querySelector('[data-photo-close]')?.addEventListener('click', () => modal.close());
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) modal.close();
+    });
+    modal.addEventListener('close', () => {
+        if (image instanceof HTMLImageElement) image.removeAttribute('src');
+    });
+});
+
+document.querySelector('[data-print-report]')?.addEventListener('click', () => window.print());

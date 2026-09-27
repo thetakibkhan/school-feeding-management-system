@@ -1,0 +1,372 @@
+@import './beams-background.css';
+@import './auth.css';
+@import './dashboard.css';
+@import './table.css';
+@import './modal.css';
+@import './photo-modal.css';
+@import './daily-report.css';
+
+:root {
+    color-scheme: light;
+    --ui-background: #f5f5f7;
+    --ui-surface: #fff;
+    --ui-surface-secondary: #f2f2f7;
+    --ui-ink: #1d1d1f;
+    --ui-muted: #6e6e73;
+    --ui-line: #d2d2d7;
+    --ui-accent: #007aff;
+    --ui-accent-hover: #0066cc;
+    --ui-accent-soft: #e8f2ff;
+    --ui-success: #248a3d;
+    --ui-success-soft: #e7f5e9;
+    --ui-danger: #d70015;
+    --ui-danger-soft: #fff0f0;
+    --ui-warning: #8a5a00;
+    --ui-warning-soft: #fff5dc;
+    --dashboard-ink: var(--ui-ink);
+    --dashboard-muted: var(--ui-muted);
+    --dashboard-line: var(--ui-line);
+    --dashboard-surface: var(--ui-surface);
+    --dashboard-bg: var(--ui-background);
+    --dashboard-accent: var(--ui-accent);
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --ui-background: #111113;
+    --ui-surface: #1c1c1e;
+    --ui-surface-secondary: #2c2c2e;
+    --ui-ink: #f5f5f7;
+    --ui-muted: #a1a1a6;
+    --ui-line: #38383a;
+    --ui-accent: #0a84ff;
+    --ui-accent-hover: #409cff;
+    --ui-accent-soft: #152c45;
+    --ui-success: #30d158;
+    --ui-success-soft: #17351f;
+    --ui-danger: #ff453a;
+    --ui-danger-soft: #3b191b;
+    --ui-warning: #ffd60a;
+    --ui-warning-soft: #3b3014;
+}
+
+html { color-scheme: light; }
+
+body,
+.app-shell {
+    color: var(--ui-ink);
+    background: var(--ui-background);
+}
+
+.app-shell__background { display: none; }
+
+.theme-toggle {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 1000;
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    place-items: center;
+    border: 1px solid var(--ui-line);
+    border-radius: 50%;
+    color: var(--ui-ink);
+    background: var(--ui-surface);
+    box-shadow: 0 0.25rem 1rem rgb(0 0 0 / 16%);
+    cursor: pointer;
+    font: inherit;
+    font-size: 1.15rem;
+}
+
+.theme-toggle:hover { background: var(--ui-surface-secondary); }
+
+:where(a, button, input, select, textarea, summary):focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--ui-accent) 45%, transparent);
+    outline-offset: 2px;
+}
+
+.dashboard-sidebar,
+.dashboard-topbar {
+    color: var(--ui-ink);
+    background: var(--ui-surface);
+}
+
+.dashboard-sidebar__brand,
+.dashboard-sidebar__footer,
+.dashboard-topbar,
+.school-detail-card__heading,
+.editable-table-toolbar,
+.school-pagination {
+    border-color: var(--ui-line);
+}
+
+.dashboard-nav-item,
+.dashboard-submenu__item,
+.dashboard-user-card__details small,
+.dashboard-icon-button,
+.dashboard-topbar__date,
+.user-management__heading p:last-child,
+.delivery-help,
+.delivery-demand,
+.demand-setup__form label,
+.demand-setup__form legend {
+    color: var(--ui-muted);
+}
+
+.dashboard-nav-item:hover,
+.dashboard-nav-item.is-active,
+.dashboard-submenu__item:hover,
+.dashboard-submenu__item.is-active {
+    color: var(--ui-accent-hover);
+    background: var(--ui-accent-soft);
+}
+
+.dashboard-nav-badge,
+.dashboard-sidebar__rail,
+.dashboard-icon-button:hover {
+    color: var(--ui-accent-hover);
+    border-color: var(--ui-line);
+    background: var(--ui-surface-secondary);
+}
+
+.editable-table-card,
+.user-modal,
+.demand-setup__inline-form {
+    color: var(--ui-ink);
+    border-color: var(--ui-line);
+    background: var(--ui-surface);
+    box-shadow: 0 0.5rem 1.5rem rgb(29 29 31 / 6%);
+}
+
+.editable-table-toolbar,
+.school-detail-card__heading {
+    background: var(--ui-surface-secondary);
+}
+
+.editable-table-search,
+.demand-setup__form input,
+.demand-setup__form select,
+.demand-setup__filter input,
+.demand-setup__inline-form input,
+.delivery-form > input:not([type="hidden"]),
+.delivery-form > select,
+.delivery-quantity-row input,
+.user-modal input,
+.user-modal select {
+    color: var(--ui-ink);
+    border-color: var(--ui-line);
+    background: var(--ui-surface);
+}
+
+.editable-table-search input::placeholder,
+.demand-setup__form input::placeholder,
+.demand-setup__filter input::placeholder,
+.delivery-form input::placeholder {
+    color: var(--ui-muted);
+    opacity: 1;
+}
+
+.editable-table-search button,
+.user-management__primary-action,
+.demand-setup__filter button,
+.demand-setup__inline-form button {
+    color: #fff;
+    border-color: var(--ui-accent);
+    background: var(--ui-accent);
+}
+
+.editable-table input[type="checkbox"],
+.demand-setup__check input { accent-color: var(--ui-accent); }
+
+.user-cell__avatar {
+    color: var(--ui-accent-hover);
+    background: var(--ui-accent-soft);
+}
+
+.user-status--active { color: var(--ui-success); background: var(--ui-success-soft); }
+.user-status--inactive { color: var(--ui-danger); background: var(--ui-danger-soft); }
+.editable-table__actions a, .delivery-table td a { color: var(--ui-accent-hover); }
+.editable-table__actions button { color: var(--ui-danger); }
+
+.editable-table-search input,
+.editable-table-count strong,
+.editable-table td,
+.user-role,
+.school-detail-card__heading h3 {
+    color: var(--ui-ink);
+}
+
+.editable-table th {
+    color: var(--ui-muted);
+    background: var(--ui-surface-secondary);
+}
+
+.editable-table td { border-color: var(--ui-line); }
+
+.editable-table tbody tr:hover,
+.editable-table tbody tr.is-selected { background: #f7faff; }
+
+.school-detail-card__note {
+    color: var(--ui-muted);
+    background: var(--ui-surface-secondary);
+}
+
+.demand-setup__inline-form .demand-setup__check,
+.delivery-form > label,
+.delivery-quantity-row label,
+.user-modal label { color: var(--ui-ink); }
+
+.delivery-schedule-note {
+    color: var(--ui-ink);
+    border-color: #b7d4ff;
+    background: var(--ui-accent-soft);
+}
+
+.delivery-schedule-note span,
+.delivery-current-photo {
+    color: var(--ui-ink);
+    border-color: var(--ui-line);
+    background: var(--ui-surface);
+}
+
+.delivery-schedule-note small,
+.delivery-optional,
+.delivery-quantity-row label small,
+.school-pagination p,
+.school-pagination span,
+.editable-table-count { color: var(--ui-muted); }
+
+.user-management__notice {
+    color: var(--ui-success);
+    background: var(--ui-success-soft);
+}
+
+.user-management__notice--error {
+    color: var(--ui-danger);
+    background: var(--ui-danger-soft);
+}
+
+.editable-table__actions a,
+.delivery-table td a,
+.delivery-back-link,
+.demand-setup__edit { color: var(--ui-accent-hover); }
+
+.demand-setup__link,
+.editable-table__actions button,
+.delivery-required,
+.school-form-errors { color: var(--ui-danger); }
+
+.dashboard-sidebar__rail { box-shadow: 0 2px 8px rgb(29 29 31 / 10%); }
+
+.dashboard-overview,
+.daily-report { color: var(--ui-ink); }
+
+.dashboard-overview__heading p:last-child,
+.daily-report__heading p:last-child,
+.daily-report__date-form label { color: var(--ui-muted); }
+
+.daily-report__date-form input {
+    color: var(--ui-ink);
+    border-color: var(--ui-line);
+    background: var(--ui-surface);
+    color-scheme: light;
+}
+
+.daily-report__button {
+    color: #fff;
+    border-color: var(--ui-accent);
+    background: var(--ui-accent);
+}
+
+.daily-report__button:hover { border-color: var(--ui-accent-hover); background: var(--ui-accent-hover); }
+.daily-report__button--secondary { color: var(--ui-ink); border-color: var(--ui-line); background: var(--ui-surface); }
+.daily-report__button--secondary:hover { border-color: #a1a1a6; background: var(--ui-surface-secondary); }
+.daily-report__text-link { color: var(--ui-accent-hover); }
+
+.daily-report__card,
+.dashboard-shortfalls,
+.dashboard-metric-card {
+    border-color: var(--ui-line);
+    background: var(--ui-surface);
+    box-shadow: 0 0.5rem 1.5rem rgb(29 29 31 / 5%);
+}
+
+.daily-report__card-heading h3,
+.dashboard-shortfalls__heading h3,
+.dashboard-metric-card__heading h3 { color: var(--ui-ink); }
+
+.daily-report__badge,
+.dashboard-shortfalls__heading > span {
+    color: var(--ui-accent-hover);
+    border-color: #b7d4ff;
+    background: var(--ui-accent-soft);
+}
+
+.daily-report__notice { color: #174c80; border-color: #b7d4ff; background: var(--ui-accent-soft); }
+.daily-report__notice--error { color: var(--ui-danger); border-color: #f3b5bb; background: var(--ui-danger-soft); }
+.daily-report__table-wrap { border-color: var(--ui-line); }
+.daily-report__table { color: var(--ui-ink); }
+.daily-report__table th, .daily-report__table td { border-color: var(--ui-line); }
+.daily-report__table thead th { color: #3a3a3c; background: var(--ui-surface-secondary); }
+.daily-report__table thead tr:first-child th[colspan] { color: var(--ui-ink); }
+.daily-report__table tbody tr:hover { background: #f7faff; }
+.daily-report__table tfoot th, .daily-report__table tfoot td { color: var(--ui-ink); background: #e8e8ed; }
+.daily-report__entry-state { color: var(--ui-success); }
+.daily-report__entry-state--missing { color: var(--ui-warning); }
+.daily-report__empty { color: var(--ui-muted); }
+.dashboard-metric-card__heading span, .dashboard-metric-card dt { color: var(--ui-muted); }
+.dashboard-metric-card dl div { background: var(--ui-surface-secondary); }
+.dashboard-metric-card dd { color: var(--ui-ink); }
+.dashboard-shortfalls__heading { border-color: var(--ui-line); }
+.dashboard-shortfalls__items span { color: var(--ui-danger); background: var(--ui-danger-soft); }
+
+.auth-shell-layout__background { display: none; }
+.auth-shell-layout { background: var(--ui-background); }
+.clean-signin-page { color: var(--ui-ink); background: var(--ui-background); }
+.clean-signin-card { border-color: var(--ui-line); background: var(--ui-surface); box-shadow: 0 1rem 3rem rgb(29 29 31 / 8%); }
+.clean-signin-icon { color: var(--ui-accent-hover); border-color: var(--ui-line); background: var(--ui-surface-secondary); box-shadow: none; }
+.clean-signin-card h1 { color: var(--ui-ink); }
+.clean-signin-description,
+.clean-signin-options,
+.clean-signin-note { color: var(--ui-muted); }
+.clean-signin-input-wrap svg { color: var(--ui-muted); }
+.clean-signin-input-wrap input { color: var(--ui-ink); border-color: var(--ui-line); background: var(--ui-surface); }
+.clean-signin-input-wrap input:focus { border-color: var(--ui-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-accent) 20%, transparent); }
+.clean-signin-options a { color: var(--ui-accent-hover); }
+.clean-signin-remember input { accent-color: var(--ui-accent); }
+.clean-signin-submit { color: #fff; background: var(--ui-accent); }
+.clean-signin-submit:hover { background: var(--ui-accent-hover); filter: none; }
+.clean-signin-divider { color: var(--ui-muted); }
+.clean-signin-divider::before, .clean-signin-divider::after { border-color: var(--ui-line); }
+.clean-signin-socials button { border-color: var(--ui-line); color: var(--ui-muted); background: var(--ui-surface-secondary); }
+.clean-signin-error { color: var(--ui-danger); background: var(--ui-danger-soft); }
+
+:root[data-theme="dark"] .dashboard-sidebar,
+:root[data-theme="dark"] .dashboard-topbar {
+    background: var(--ui-surface);
+}
+
+:root[data-theme="dark"] .dashboard-sidebar-backdrop { background: rgb(0 0 0 / 62%); }
+:root[data-theme="dark"] .dashboard-nav-badge { color: var(--ui-accent-hover); background: var(--ui-accent-soft); }
+:root[data-theme="dark"] .dashboard-submenu { border-color: var(--ui-line); }
+:root[data-theme="dark"] .editable-table tbody tr:hover,
+:root[data-theme="dark"] .editable-table tbody tr.is-selected,
+:root[data-theme="dark"] .daily-report__table tbody tr:hover { background: #242428; }
+:root[data-theme="dark"] .delivery-schedule-note { color: #c5ddfb; border-color: #31577f; background: #182b40; }
+:root[data-theme="dark"] .daily-report__badge,
+:root[data-theme="dark"] .dashboard-shortfalls__heading > span { border-color: #31577f; }
+:root[data-theme="dark"] .daily-report__notice { color: #c5ddfb; border-color: #31577f; background: #182b40; }
+:root[data-theme="dark"] .daily-report__notice--error { color: #ffaaa5; border-color: #70403d; background: #351e20; }
+:root[data-theme="dark"] .daily-report__table thead th { color: #e5e5ea; }
+:root[data-theme="dark"] .daily-report__table tfoot th,
+:root[data-theme="dark"] .daily-report__table tfoot td { background: #2c2c2e; }
+:root[data-theme="dark"] .clean-signin-socials button { color: var(--ui-muted); }
+
+@media print {
+    .theme-toggle { display: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}

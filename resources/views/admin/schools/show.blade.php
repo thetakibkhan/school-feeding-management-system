@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $school->name }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/ui.css', 'resources/js/app.js'])
 </head>
 <body>
     <x-dashboard-shell active="Schools">
@@ -12,7 +12,7 @@
             <div class="user-management__heading">
                 <div>
                     <p class="dashboard-eyebrow">School record</p>
-                    <h2>{{ $school->name }}</h2>
+                    <h2 class="font-bangla">{{ $school->name }}</h2>
                     <p>School code: {{ $school->school_code }} · EMIS code: {{ $school->emis_code }}</p>
                 </div>
                 <a class="user-management__primary-action" href="{{ route('admin.schools.index') }}">Back to schools</a>
@@ -49,7 +49,7 @@
             <button class="modal-layer__backdrop" type="button" data-modal-close aria-label="Close dialog"></button>
             <section class="user-modal school-modal" role="dialog" aria-modal="true" aria-labelledby="add-student-count-title">
                 <button class="user-modal__close" type="button" data-modal-close aria-label="Close dialog">×</button>
-                <p class="dashboard-eyebrow">{{ $school->name }}</p>
+                <p class="dashboard-eyebrow font-bangla">{{ $school->name }}</p>
                 <h2 id="add-student-count-title">Add student count</h2>
                 <p class="user-modal__description">Use the date when this count starts applying. Past dates are allowed.</p>
                 @if ($errors->any())

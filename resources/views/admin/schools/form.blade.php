@@ -21,6 +21,12 @@
     <label for="emis-code">EMIS code</label>
     <input id="emis-code" name="emis_code" value="{{ old('emis_code', $school?->emis_code) }}" required>
 
+    <label for="principal-name">Principal name (optional)</label>
+    <input id="principal-name" name="principal_name" value="{{ old('principal_name', $school?->principal_name) }}">
+
+    <label for="principal-mobile">Principal mobile (optional)</label>
+    <input id="principal-mobile" name="principal_mobile" type="tel" inputmode="tel" value="{{ old('principal_mobile', $school?->principal_mobile) }}">
+
     <label for="student-count">Initial student count</label>
     <input id="student-count" name="student_count" type="number" min="1" value="{{ old('student_count') }}" required>
 

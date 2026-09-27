@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School management</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/ui.css', 'resources/js/app.js'])
 </head>
 <body>
     <x-dashboard-shell active="Schools">
-        <section class="user-management school-management" data-editable-table data-table-search-keys="name,schoolCode,emisCode">
+        <section class="user-management school-management">
             <div class="user-management__heading">
                 <div>
                     <p class="dashboard-eyebrow">Administration</p>
@@ -29,33 +29,42 @@
                 <div class="editable-table-toolbar">
                     <form method="GET" action="{{ route('admin.schools.index') }}" class="editable-table-search">
                         <span aria-hidden="true">⌕</span>
-                        <input type="search" name="search" placeholder="Search school, code, or EMIS" value="{{ $search }}" data-table-search>
+                        <input type="search" name="search" placeholder="Search school, code, or EMIS" value="{{ $search }}">
+                        <button type="submit" aria-label="Search schools">Search</button>
                     </form>
-                    <span class="editable-table-count"><strong data-table-visible-count>{{ $schools->count() }}</strong> schools</span>
+                    <span class="editable-table-count">Showing {{ $schools->firstItem() ?? 0 }}–{{ $schools->lastItem() ?? 0 }} of {{ $schools->total() }} schools</span>
                 </div>
                 <div class="editable-table-scroll">
-                    <table class="editable-table">
+                    <table class="editable-table school-list-table">
                         <thead>
                             <tr>
-                                <th><button type="button" data-table-sort="name">School <span>↕</span></button></th>
-                                <th><button type="button" data-table-sort="schoolCode">School code <span>↕</span></button></th>
-                                <th><button type="button" data-table-sort="emisCode">EMIS code <span>↕</span></button></th>
-                                <th><button type="button" data-table-sort="students">Current students <span>↕</span></button></th>
+                                <th>School</th>
+                                <th>School code</th>
+                                <th>EMIS code</th>
+                                <th>Principal</th>
+                                <th>Principal mobile</th>
+                                <th>Current students</th>
+                                <th>90% calculated</th>
+                                <th>Nearest whole number</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody data-table-body>
                             @forelse ($schools as $school)
                                 @php($currentCount = $school->studentCounts->first())
-                                <tr data-table-row data-name="{{ mb_strtolower($school->name) }}" data-school-code="{{ strtolower($school->school_code) }}" data-emis-code="{{ strtolower($school->emis_code) }}" data-students="{{ $currentCount?->student_count ?? 0 }}">
-                                    <td><div class="user-cell"><span class="user-cell__avatar">বিদ্যালয়</span><strong>{{ $school->name }}</strong></div></td>
+                                <tr>
+                                    <td><div class="user-cell"><span class="user-cell__avatar school-row-number" aria-label="School {{ ($schools->firstItem() ?? 1) + $loop->index }}">{{ ($schools->firstItem() ?? 1) + $loop->index }}</span><strong class="font-bangla">{{ $school->name }}</strong></div></td>
                                     <td class="editable-table__muted">{{ $school->school_code }}</td>
                                     <td class="editable-table__muted">{{ $school->emis_code }}</td>
+                                    <td class="font-bangla">{{ $school->principal_name ?: '—' }}</td>
+                                    <td>{{ $school->principal_mobile ?: '—' }}</td>
                                     <td>{{ $currentCount ? number_format($currentCount->student_count) : 'No count yet' }}</td>
+                                    <td>{{ $currentCount ? number_format($currentCount->student_count * 0.9, 1) : '—' }}</td>
+                                    <td>{{ $currentCount ? number_format((int) round($currentCount->student_count * 0.9)) : '—' }}</td>
                                     <td>
                                         <div class="editable-table__actions">
                                             <a href="{{ route('admin.schools.show', $school) }}">View</a>
-                                            <button type="button" data-edit-school data-action="{{ route('admin.schools.update', $school) }}" data-name="{{ $school->name }}" data-school-code="{{ $school->school_code }}" data-emis-code="{{ $school->emis_code }}">Edit</button>
+                                            <button type="button" data-edit-school data-action="{{ route('admin.schools.update', $school) }}" data-name="{{ $school->name }}" data-school-code="{{ $school->school_code }}" data-emis-code="{{ $school->emis_code }}" data-principal-name="{{ $school->principal_name }}" data-principal-mobile="{{ $school->principal_mobile }}">Edit</button>
                                             <form method="POST" action="{{ route('admin.schools.destroy', $school) }}" onsubmit="return confirm('Delete this school and its unused student-count history?');">
                                                 @csrf
                                                 @method('DELETE')
@@ -65,11 +74,13 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="5" class="editable-table-empty">No schools found.</td></tr>
+                                <tr><td colspan="9" class="editable-table-empty">No schools found.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
-                    <p class="editable-table-empty" data-table-empty hidden>No schools match your search.</p>
+                </div>
+                <div class="school-pagination">
+                    {{ $schools->onEachSide(1)->links() }}
                 </div>
             </div>
         </section>
@@ -101,6 +112,10 @@
                     <input id="edit-school-code" name="school_code" required>
                     <label for="edit-emis-code">EMIS code</label>
                     <input id="edit-emis-code" name="emis_code" required>
+                    <label for="edit-principal-name">Principal name (optional)</label>
+                    <input id="edit-principal-name" name="principal_name">
+                    <label for="edit-principal-mobile">Principal mobile (optional)</label>
+                    <input id="edit-principal-mobile" name="principal_mobile" type="tel" inputmode="tel">
                     <button class="user-management__primary-action" type="submit">Save changes</button>
                 </form>
             </section>

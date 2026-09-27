@@ -1,0 +1,772 @@
+[
+  {
+    "id": 1,
+    "school_name": "বৈরাগ সপ্রাবি",
+    "principal_name": "মো: গোলাম জিলানী",
+    "principal_phone": "০১৮৪০৬৬৬০৫৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 2,
+    "school_name": "বদলপুরা সপ্রাবি",
+    "principal_name": "রোকেয়া ফেরদৌসী",
+    "principal_phone": "০১৭১২২৯৪৫৭৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 3,
+    "school_name": "মেরিন একাডেমী সপ্রাবি",
+    "principal_name": "মোহাম্মদ ইসমাইল",
+    "principal_phone": "০১৭৬২৪৯৬৫৩২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 4,
+    "school_name": "উত্তর বন্দর সপ্রাবি",
+    "principal_name": "মোহাম্মদ ইব্রাহীম",
+    "principal_phone": "১৮১৯৩০৯৬১৬",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 5,
+    "school_name": "মধ্য বন্দর সপ্রাবি",
+    "principal_name": "আবদুল খালেক",
+    "principal_phone": "০১৮১৮১৩২৩৫৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 6,
+    "school_name": "দক্ষিণ বন্দর সপ্রাবি",
+    "principal_name": "শিল্পী রানী মিত্র",
+    "principal_phone": "০১৮৮৩৮৫৭৫৬৭",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 7,
+    "school_name": "পূর্ব বৈরাগ সপ্রাবি",
+    "principal_name": "সুজয় পাল",
+    "principal_phone": "০১৮১৪৩৫৪৪১০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 8,
+    "school_name": "মহাদেবপুর সপ্রাবি",
+    "principal_name": "অন্তিম পাল",
+    "principal_phone": "১৮১৮৮১০৭৩৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 9,
+    "school_name": "উত্তর গুয়াপঞ্চক সপ্রাবি",
+    "principal_name": "দীপিকা দাশ",
+    "principal_phone": "০১৮৪৩১৯২৭৮৬",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 10,
+    "school_name": "গুয়াপঞ্চক সপ্রাবি",
+    "principal_name": "দেবী চৌধুরী",
+    "principal_phone": "১৫৩৩৯৫০১৬২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 11,
+    "school_name": "বারশত সপ্রাবি",
+    "principal_name": "আব্দুল মাবুদ",
+    "principal_phone": "০১৮১২৪৯২১৯৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 12,
+    "school_name": "পূর্ব বোয়ালিয়া সপ্রাবি",
+    "principal_name": "মিল্টন কান্তি নাথ",
+    "principal_phone": "১৮১৫৩৮২৩৯৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 13,
+    "school_name": "দুধকুমড়া সপ্রাবি",
+    "principal_name": "রওশন আরা",
+    "principal_phone": "১৮১৮৫৯৭২৫৯",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 14,
+    "school_name": "গোবাদিয়া সপ্রাবি",
+    "principal_name": "সুভাষ চন্দ্র সিংহ",
+    "principal_phone": "১৮১৬৩৭৩৯৬৮",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 15,
+    "school_name": "গুন্দ্বীপ সপ্রাবি",
+    "principal_name": "কাজী নাহিদা শারমিন",
+    "principal_phone": "১৮৩০৫৪৬২৭১",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 16,
+    "school_name": "রায়পুর সপ্রাবি",
+    "principal_name": "মনোয়ারা সুলতানা",
+    "principal_phone": "০১৮১৬১৭৪৯৮০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 17,
+    "school_name": "উত্তর পরুয়া পাড়া সপ্রাবি",
+    "principal_name": "মোহাম্মদ নুরুল ইসলাম",
+    "principal_phone": "১৮১৬১০৮৭০০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 18,
+    "school_name": "দক্ষিণ পরুয়াপাড়া সপ্রাবি",
+    "principal_name": "মোহাম্মদ আখতারুজ্জম",
+    "principal_phone": "১৮১৪৪৭৬৪৭১",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 19,
+    "school_name": "খোর্দ্দ গহিরা সপ্রাবি",
+    "principal_name": "মোঃ আবদুর রহমান",
+    "principal_phone": "১৮১২৩৮৪৫৭৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 20,
+    "school_name": "উত্তর গহিরা সপ্রাবি",
+    "principal_name": "মোহাম্মদ আবদুল জব্বা",
+    "principal_phone": "০১৮১৯০৬৬২৯২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 21,
+    "school_name": "মধ্য গহিরা সপ্রাবি",
+    "principal_name": "নুরুল আবছার",
+    "principal_phone": "১৮১৮৯৯২৬৫৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 22,
+    "school_name": "দক্ষিণ গহিরা সপ্রাবি",
+    "principal_name": "মোহাম্মদ ইসমাইল",
+    "principal_phone": "১৮১৮৮২৬৯৬০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 23,
+    "school_name": "সরেংগা সপ্রাবি",
+    "principal_name": "মোহাম্মদ হারুনুর রশিদ",
+    "principal_phone": "০১৮১২৭৯৪৩৭৭",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 24,
+    "school_name": "বটতলী এস এম আউলি",
+    "principal_name": "মোহাম্মদ জহিরুল ইসল",
+    "principal_phone": "০১৭১৮২১১৪২৮",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 25,
+    "school_name": "চাঁপাতলী সপ্রাবি",
+    "principal_name": "লুৎফুন্নেছা বেগম",
+    "principal_phone": "১৭৩৩০৬১৩৫০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 26,
+    "school_name": "ছিরাবটতলী সপ্রাবি",
+    "principal_name": "শিলু শীল",
+    "principal_phone": "১৮১৫১১৩২৮৮",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 27,
+    "school_name": "তুলাতলী আইরমঙ্গল সপ্রাবি",
+    "principal_name": "ফেরদৌস আরা বেগম",
+    "principal_phone": "১৭২৪৬০৯৯৩৮",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 28,
+    "school_name": "পশ্চিম বরৈয়া সপ্রাবি",
+    "principal_name": "মোহাম্মদ নাছির উদ্দিন",
+    "principal_phone": "০১৮১৫১৩৯০১২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 29,
+    "school_name": "পূর্ব বরৈয়া সরকারি প্রা",
+    "principal_name": "শিপ্রা দাশ",
+    "principal_phone": "১৮১১২৯৯২৫৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 30,
+    "school_name": "আইর মঙ্গল সপ্রাবি",
+    "principal_name": "মোহাম্মদ শাহ আলম ভ",
+    "principal_phone": "০১৮১৪৭০৪৯৮১",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 31,
+    "school_name": "পূর্ব বটতলী সপ্রাবি",
+    "principal_name": "উমা দাশ",
+    "principal_phone": "১৮১৮৯৫২৫০৪",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 32,
+    "school_name": "বরুমচড়া সপ্রাবি",
+    "principal_name": "হায়াতুন নেছা",
+    "principal_phone": "১৮১৮৮৯১৯০৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 33,
+    "school_name": "বরুমচড়া ছমদিয়া সপ্রাবি",
+    "principal_name": "মুহাম্মদ শহীদুল্লাহ",
+    "principal_phone": "১৮১৬২৮২১২২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 34,
+    "school_name": "উত্তর বরুমচড়া সপ্রাবি",
+    "principal_name": "জাহেদা বেগম",
+    "principal_phone": "১৮৭৯৩০৯৮৩৪",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 35,
+    "school_name": "বরুমচড়া নলদিয়া সপ্রাবি",
+    "principal_name": "মুহাম্মদ আবুল কাসেম",
+    "principal_phone": "১৮১৫৮৫০৩৮৮",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 36,
+    "school_name": "পশ্চিম বরুমচড়া সপ্রাবি",
+    "principal_name": "শামীম আকতার",
+    "principal_phone": "১৮৬৪৭৬৪২৩৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 37,
+    "school_name": "খুরুস্কুল সপ্রাবি",
+    "principal_name": "মোঃ নাছির উদ্দীন",
+    "principal_phone": "১৮২৪৫৬৩০০৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 38,
+    "school_name": "উত্তর জুঁইদণ্ডী সপ্রাবি",
+    "principal_name": "নাছরিন ফাতেমা রিমা",
+    "principal_phone": "১৮৪০৩৬৬০০৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 39,
+    "school_name": "দক্ষিণ জুঁইদণ্ডী সপ্রাবি",
+    "principal_name": "খাদিজা আক্তার",
+    "principal_phone": "১৭২৩৪৯১১৯৪",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 40,
+    "school_name": "পূর্ব জুঁইদণ্ডী সপ্রাবি",
+    "principal_name": "হেফাজ উদ্দিন",
+    "principal_phone": "১৮২০০৯৪২৮৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 41,
+    "school_name": "তৈলারদ্বীপ সপ্রাবি",
+    "principal_name": "রুবী রাণী দাশ",
+    "principal_phone": "১৮১৬৫১৬৩২৪",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 42,
+    "school_name": "তৈলারদ্বীপ বারখাইন সা",
+    "principal_name": "পুলক কুমার সেন",
+    "principal_phone": "১৮১৯৮৯২০৯৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 43,
+    "school_name": "বারখাইন পদ্মপাড়া সপ্রা",
+    "principal_name": "গীতা প্রভা দত্ত",
+    "principal_phone": "১৮২০৮৫৭৯১৪",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 44,
+    "school_name": "পশ্চিম বারখাইন সপ্রাবি",
+    "principal_name": "তানিয়া সুলতানা রুপা",
+    "principal_phone": "১৮১৬৩৬২০৩৭",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 45,
+    "school_name": "ঝিওরী সপ্রাবি",
+    "principal_name": "জগন্নাথ দাশ",
+    "principal_phone": "১৮১৮২২২৫৫১",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 46,
+    "school_name": "হাজীগাঁও ঝিওরি সপ্রাবি",
+    "principal_name": "পিলেন মিত্র",
+    "principal_phone": "১৮১৬০০৮৭৫৪",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 47,
+    "school_name": "হাজীগাঁও সপ্রাবি",
+    "principal_name": "বিকাশ কান্তি ঘোষ",
+    "principal_phone": "১৮৩৮০৩১৫৮৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 48,
+    "school_name": "শোলকাটা সপ্রাবি",
+    "principal_name": "মোছাম্মৎ হমায়রা বেগম",
+    "principal_phone": "০১৯২৪২৮০৪৫৪",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 49,
+    "school_name": "শিলাইগড়া সপ্রাবি",
+    "principal_name": "মোছাম্মৎ জান্নাতুল ফের",
+    "principal_phone": "১৮১৫৮১৬০৩৬",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 50,
+    "school_name": "সৈয়দ কুচাইয়া আমির",
+    "principal_name": "রতন কান্তি শীল",
+    "principal_phone": "০১৭১০৩১৫৫১৯",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 51,
+    "school_name": "পূর্ব বারখাইন সপ্রাবি",
+    "principal_name": "দিলুয়ারা বেগম",
+    "principal_phone": "১৮১৩৯৫৪৩৭১",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 52,
+    "school_name": "আনোয়ারা মডেল সপ্রাবি",
+    "principal_name": "কে.এম. ছরোয়ার হোছা",
+    "principal_phone": "১৮১৯১৭১২০৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 53,
+    "school_name": "আনোয়ারা সরস্বতী সপ্র",
+    "principal_name": "অরুন কুমার গুপ্ত",
+    "principal_phone": "০১৮১৮৭১৭২৭৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 54,
+    "school_name": "বিলপুর সপ্রাবি",
+    "principal_name": "রুনু রানী শুর",
+    "principal_phone": "০১৭৮১৩৩১১৫৭",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 55,
+    "school_name": "ধানপুরা বোয়ালগাঁও সপ্র",
+    "principal_name": "তিন্নি চক্রবর্তী",
+    "principal_phone": "১৯৮৬৪৩৭৮২৭",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 56,
+    "school_name": "খিলপাড়া সপ্রাবি",
+    "principal_name": "নন্দিতা দত্ত",
+    "principal_phone": "১৮১৬৬১১৪৯৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 57,
+    "school_name": "চাতরী সপ্রাবি",
+    "principal_name": "নিলাম তবিব",
+    "principal_phone": "১৮৩৯৯১০৮৮৬",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 58,
+    "school_name": "বেলচূড়া সপ্রাবি",
+    "principal_name": "আমেনা বেগম",
+    "principal_phone": "০১৮১৪০৭৮৩০৭",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 59,
+    "school_name": "কৈনপুরা সপ্রাবি",
+    "principal_name": "আয়েশা আকতার চৌধুরী",
+    "principal_phone": "০১৮১১৯৩১৪৪৭",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 60,
+    "school_name": "সিংহরা সপ্রাবি",
+    "principal_name": "রুপন কান্তি শীল",
+    "principal_phone": "১৮১৪৮৫৫৩৯৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 61,
+    "school_name": "কেয়াগড় সপ্রাবি",
+    "principal_name": "কনিকা চৌধুরী",
+    "principal_phone": "০১৯১৪০৫০৭০০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 62,
+    "school_name": "ডুমুরিয়া বুদুরা সরকারি",
+    "principal_name": "মিতা দে",
+    "principal_phone": "১৮১৮৫৫৮১৮১",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 63,
+    "school_name": "পরৈকোড়া সপ্রাবি",
+    "principal_name": "বেবী রাণী দাশ গুপ্তা",
+    "principal_phone": "১৮১২৯৬২৭৭৯",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 64,
+    "school_name": "কৈখাইন সপ্রাবি",
+    "principal_name": "সুজয় পাল",
+    "principal_phone": "১৮২০১৬৭৩৩০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 65,
+    "school_name": "পরৈকোড়া চারুশীলা সপ্ত",
+    "principal_name": "উজ্জ্বল বোস",
+    "principal_phone": "১৮১৯৭৪৭৪৪৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 66,
+    "school_name": "তালসরা সরকারী প্রাথা",
+    "principal_name": "শাহানা ইয়াসমিন",
+    "principal_phone": "১৮১৬৭০৪০০২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 67,
+    "school_name": "ওসখাইন ইউচুপ আলী",
+    "principal_name": "পূরবী রানী দাশ",
+    "principal_phone": "১৮২১৬৩৯৯২০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 68,
+    "school_name": "শিলালীয়া সপ্রাবি",
+    "principal_name": "কল্লোল নাথ",
+    "principal_phone": "১৮৮৩১২৯১৭৭",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 69,
+    "school_name": "পাটনীকোঠা সপ্রাবি",
+    "principal_name": "অনিমা দাশ",
+    "principal_phone": "১৮১৬০৮৭২১৯",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 70,
+    "school_name": "মাহাতা সপ্রাবি",
+    "principal_name": "নিপু রাণী পাল",
+    "principal_phone": "১৮১৫৮১৮৯১২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 71,
+    "school_name": "দেওতলা সপ্রাবি",
+    "principal_name": "রতন কান্তি নাথ",
+    "principal_phone": "১৮১২৪৫০৩৭৭",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 72,
+    "school_name": "রমজান আলী সপ্রাবি",
+    "principal_name": "মোজাহের মিঞা",
+    "principal_phone": "১৮১২৫৫৪৮১৪",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 73,
+    "school_name": "ভিংরোল সপ্রাবি",
+    "principal_name": "সঞ্জীব মজুমদার",
+    "principal_phone": "১৮১৫৬৫১৩৯৮",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 74,
+    "school_name": "হাইলধর সপ্রাবি",
+    "principal_name": "মুহাম্মদ মোহছেন আলী",
+    "principal_phone": "০১৮১৬৩৬০৬৩২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 75,
+    "school_name": "দক্ষিন ইছাখালী সপ্রাবি",
+    "principal_name": "বিবি হাজেরা",
+    "principal_phone": "০১৮৩৭২৪০৮০৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 76,
+    "school_name": "পীরখাইন সপ্রাবি",
+    "principal_name": "কে এম এরশাদ হোসাই",
+    "principal_phone": "১৮১৯৯৮৩১৭৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 77,
+    "school_name": "তেকোটা সপ্রাবি",
+    "principal_name": "নাসরিন আক্তার",
+    "principal_phone": "১৮১১৮৭১৪৪০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 78,
+    "school_name": "হেটিখাইন সপ্রাবি",
+    "principal_name": "মিন্টু দে",
+    "principal_phone": "০১৮১৮০৯১৯১৯",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 79,
+    "school_name": "কুনিরবিল সপ্রাবি",
+    "principal_name": "ইয়াসমিন আক্তার খানম",
+    "principal_phone": "১৮২৯০৪৫৮০০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 80,
+    "school_name": "গুজরা তিশরী সপ্রাবি",
+    "principal_name": "মোহাম্মদ ইলিয়াছ",
+    "principal_phone": "১৭১৭৬৮৭৯৫০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 81,
+    "school_name": "গুজরা সপ্রাবি",
+    "principal_name": "জাকিয়া খাতুন",
+    "principal_phone": "১৬২৪৬৫০৭২০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 82,
+    "school_name": "খাসখামা সপ্রাবি",
+    "principal_name": "আছাদুল হক",
+    "principal_phone": "১৮১২৯৮৪৯০০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 83,
+    "school_name": "উত্তর ইছাখালী সপ্রাবি",
+    "principal_name": "তানভীনা সাইমুন",
+    "principal_phone": "১৭৬৩৬৩৮৬০৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 84,
+    "school_name": "মালঘর সপ্রাবি",
+    "principal_name": "মোহাম্মদ মফিজুর রহম",
+    "principal_phone": "১৮১৫১৩৩৩৮০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 85,
+    "school_name": "উত্তর হাইলধর সপ্রাবি",
+    "principal_name": "মোঃ এয়াকুব আলী",
+    "principal_phone": "০১৮৩৪৮৭৩৩৯২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 86,
+    "school_name": "পূর্বকন্যারা সপ্রাবি",
+    "principal_name": "মোহাম্মদ জসীম উদ্দীন",
+    "principal_phone": "১৮২৫১৪৬৭২০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 87,
+    "school_name": "বরুমচড়া আদর্শ সপ্রাবি",
+    "principal_name": "খালেদা বেগম",
+    "principal_phone": "১৮৪১০১৬০২২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 88,
+    "school_name": "উত্তর সরেঙ্গা সপ্রাবি",
+    "principal_name": "মোহাম্মদ ইদ্রিচ",
+    "principal_phone": "১৮১৮৪৭২৫৬০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 89,
+    "school_name": "বরুমচড়া উদয়ন সপ্রাবি",
+    "principal_name": "শিবু রানী দাশ",
+    "principal_phone": "১৮১৩১৯২৪৬০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 90,
+    "school_name": "পূর্ব গহিরা সপ্রাবি",
+    "principal_name": "মোহাম্মদ ইদ্রিচ আলম",
+    "principal_phone": "০১৮২৪৯১৪০২৬",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 91,
+    "school_name": "দক্ষিণ বারশত সপ্রাবি",
+    "principal_name": "মোহাম্মদ নূরুন্নবী আনে",
+    "principal_phone": "০১৮১৪২৭০৪০৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 92,
+    "school_name": "চুন্নাপাড়া মৌলভী ফররু",
+    "principal_name": "শাহেদ মুহাম্মদ আমির",
+    "principal_phone": "১৮১৮১১৭৭০৬",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 93,
+    "school_name": "রুদুরা সারদা চরণ সপ্তা",
+    "principal_name": "বিনা চৌধুরী",
+    "principal_phone": "০১৮২৮০৫৩২৮৪",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 94,
+    "school_name": "চেনামতি গিরিবালা সপ্র",
+    "principal_name": "বেলী বড়ুয়া",
+    "principal_phone": "১৮১১২৭৬৩৯০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 95,
+    "school_name": "উত্তর চুন্নাপাড়া আলীমুদ্দী",
+    "principal_name": "আবদুর রহিম",
+    "principal_phone": "১৮১১৮০১৩৪",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 96,
+    "school_name": "হাজী মীর আহমদ সপ্তা",
+    "principal_name": "মোহাম্মদ নাজিম উদ্দিন",
+    "principal_phone": "০১৮১৪৭৮২৮৯২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 97,
+    "school_name": "মধ্য জুইদন্ডী সপ্রাবি",
+    "principal_name": "শাহীদা বেগম",
+    "principal_phone": "১৮১৩৬৮৩৭৭২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 98,
+    "school_name": "বরুমচড়া জনতা সপ্রাবি",
+    "principal_name": "মুহাম্মদ আবুল মনসুর",
+    "principal_phone": "১৮১৮৯১১৫৯০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 99,
+    "school_name": "আলহাজ্ব ফজলুল কাদে",
+    "principal_name": "রোশন জাহান",
+    "principal_phone": "১৮১৫২০৫০৬১",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 100,
+    "school_name": "গুন্ন্দ্বীপ আদর্শ সপ্রাবি",
+    "principal_name": "সুধীর চন্দ্র নাথ",
+    "principal_phone": "০১৮১২৫৬৫৪৮৯",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 101,
+    "school_name": "আনোয়ারা অগ্রযাত্রা সপ্র",
+    "principal_name": "মোহাম্মদ ছরওয়ার কাম",
+    "principal_phone": "১৮৪৮১৬৯১৯৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 102,
+    "school_name": "পশ্চিম রায়পুর সপ্রাবি",
+    "principal_name": "মোঃ আশরাফ আলী হে",
+    "principal_phone": "১৮১২৬৮৮৫৩০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 103,
+    "school_name": "মামুর খাইন সপ্রাবি",
+    "principal_name": "সমীর মজুমদার",
+    "principal_phone": "১৮১১৬৩৯৮৬৩",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 104,
+    "school_name": "পশ্চিমচাল সুলতানিয়া",
+    "principal_name": "দূর্জয়া মিত্র",
+    "principal_phone": "১৮৩৯৫১২৯৭৯",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 105,
+    "school_name": "দক্ষিণ শোলকাটা সপ্রা",
+    "principal_name": "হাফিজা ইব্রাহীম",
+    "principal_phone": "১৮৩২২২৩৮১২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 106,
+    "school_name": "মহতরপাড়া সপ্রাবি",
+    "principal_name": "শাহানাজ বেগম",
+    "principal_phone": "০১৮১৬২৭৮২৬৮",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 107,
+    "school_name": "পূর্ব সিংহরা পশ্চিম কন",
+    "principal_name": "স্বপ্না মল্লিক",
+    "principal_phone": "১৭২৭৬৯৪৪৬৫",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 108,
+    "school_name": "দক্ষিণ তৈলারদ্বীপ সপ্তা",
+    "principal_name": "জয়নাব বেগম",
+    "principal_phone": "০১৮৩২৩৮০২৭২",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 109,
+    "school_name": "মধ্য শিলাইগড়া সপ্রাবি",
+    "principal_name": "জাহিদ ইকবাল",
+    "principal_phone": "১৮১৪৮৮৬৫১০",
+    "source": "[cite: 1]"
+  },
+  {
+    "id": 110,
+    "school_name": "মাহাতা পাটনীকোঠা",
+    "principal_name": "সহজেসমিন আকতার",
+    "principal_phone": "১৭৩৪৪০৮৪৭৮",
+    "source": "[cite: 1]"
+  }
+]

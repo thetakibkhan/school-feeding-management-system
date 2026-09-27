@@ -17,6 +17,7 @@ class FormThirteenTemplate
      */
     public function pages(array $report, StockReportPeriod $period): array
     {
+        $report = $this->withCurrentlyRecordedValues($report);
         $schools = $report['schools'];
         $pages = [];
         for ($pageNumber = 1; $pageNumber <= 5; $pageNumber++) {
@@ -73,5 +74,53 @@ class FormThirteenTemplate
         }
 
         return $fields;
+    }
+
+    /** @param array<string, mixed> $report
+     * @return array<string, mixed>
+     */
+    private function withCurrentlyRecordedValues(array $report): array
+    {
+        foreach ($report['schools'] as $schoolIndex => $school) {
+            foreach (['bun', 'egg', 'banana'] as $item) {
+                $received = $school['items'][$item]['recorded_received'] ?? null;
+                if ($received === null) {
+                    $school['items'][$item]['received'] = null;
+                    $school['items'][$item]['available'] = null;
+                    $school['items'][$item]['closing'] = null;
+
+                    continue;
+                }
+
+                $opening = $school['items'][$item]['opening'];
+                $distributed = $school['items'][$item]['distributed'];
+                $available = $opening === null ? null : (int) $opening + (int) $received;
+                $closing = $available === null || $distributed === null
+                    ? null
+                    : $available - (int) $distributed;
+
+                $school['items'][$item]['received'] = (int) $received;
+                $school['items'][$item]['available'] = $available;
+                $school['items'][$item]['closing'] = $closing;
+            }
+            $report['schools'][$schoolIndex] = $school;
+        }
+
+        $totals = [];
+        foreach (['bun', 'egg', 'banana'] as $item) {
+            foreach (['available', 'distributed', 'closing'] as $field) {
+                $values = array_map(
+                    fn (array $school): mixed => $school['items'][$item][$field] ?? null,
+                    $report['schools'],
+                );
+                $knownValues = array_filter($values, fn (mixed $value): bool => $value !== null);
+                $totals[$item][$field] = count($knownValues) === $report['school_count']
+                    ? array_sum($knownValues)
+                    : null;
+            }
+        }
+        $report['totals'] = $totals;
+
+        return $report;
     }
 }

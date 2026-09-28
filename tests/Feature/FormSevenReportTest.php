@@ -8,6 +8,7 @@ use App\Models\FoodItem;
 use App\Models\FoodSchedule;
 use App\Models\OfficialReportPeriod;
 use App\Models\School;
+use App\Models\SchoolMonthlyPlanningQuantity;
 use App\Models\SchoolStudentCount;
 use App\Models\User;
 use App\Services\FormSevenReportService;
@@ -37,6 +38,7 @@ class FormSevenReportTest extends TestCase
         $this->assertSame('জুন-২৬', $form['month_label']);
         $this->assertSame('১৮৫', FormSevenReportService::bengaliDigits(185));
         $this->assertSame('প্রথম বিদ্যালয়', $form['rows'][0]['school']->name);
+        $this->assertSame('actual_delivery', $form['rows'][0]['quantity_source']);
         $this->assertSame(['chalans' => 2, 'quantity' => 185], $form['rows'][0]['bun']);
         $this->assertSame(['chalans' => 2, 'quantity' => 200], $form['rows'][0]['egg']);
         $this->assertSame(['chalans' => 1, 'quantity' => 50], $form['rows'][0]['banana']);
@@ -101,6 +103,7 @@ class FormSevenReportTest extends TestCase
         $preview = app(FormSevenReportService::class)->forMonth('2026-09');
         $this->assertSame(['chalans' => 0, 'quantity' => 0], $preview['totals']['bun']);
         $this->assertSame(1, $preview['missing_delivery_count']);
+        $this->assertSame(0, $preview['fixture_school_count']);
         $this->assertSame([], $preview['missing_reasons']);
         $this->assertDatabaseCount('deliveries', 0);
 
@@ -116,6 +119,36 @@ class FormSevenReportTest extends TestCase
             ->get('/admin/reports/form-7/pdf?month=2026-09')
             ->assertOk()
             ->assertHeader('Content-Type', 'application/pdf');
+    }
+
+    public function test_september_fixture_quantities_are_assumed_delivered_without_creating_chalans(): void
+    {
+        $school = $this->school('AN-001', '11111111111', 'প্রথম বিদ্যালয়');
+        $this->scheduleBunFor($school, '2026-09-02');
+        SchoolMonthlyPlanningQuantity::query()->create([
+            'school_id' => $school->id,
+            'month' => '2026-09',
+            'bun_quantity' => 160,
+            'egg_quantity' => 120,
+            'banana_quantity' => 50,
+            'source_document' => 'GPSFP_School List_Anwara Upazila.pdf',
+        ]);
+
+        $form = app(FormSevenReportService::class)->forMonth('2026-09');
+
+        $this->assertSame(1, $form['fixture_school_count']);
+        $this->assertSame('assessment_fixture', $form['rows'][0]['quantity_source']);
+        $this->assertSame(['chalans' => 0, 'quantity' => 160], $form['rows'][0]['bun']);
+        $this->assertSame(['chalans' => 0, 'quantity' => 120], $form['rows'][0]['egg']);
+        $this->assertSame(['chalans' => 0, 'quantity' => 50], $form['rows'][0]['banana']);
+        $this->assertDatabaseCount('deliveries', 0);
+
+        $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
+            ->get('/admin/reports/form-7?month=2026-09')
+            ->assertOk()
+            ->assertSee('assessment/demo fixture', false)
+            ->assertSee('delivered = demand', false)
+            ->assertSee('not Field Staff-entered transactions', false);
     }
 
     public function test_september_supplier_seed_is_idempotent_and_preserves_admin_edits(): void

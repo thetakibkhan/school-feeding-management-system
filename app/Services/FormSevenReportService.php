@@ -19,7 +19,7 @@ class FormSevenReportService
         9 => 'সেপ্টেম্বর', 10 => 'অক্টোবর', 11 => 'নভেম্বর', 12 => 'ডিসেম্বর',
     ];
 
-    /** @return array{month: string, month_label: string, supplier_name: ?string, rows: list<array<string, mixed>>, totals: array<string, array{chalans: int, quantity: int}>, missing_delivery_count: int, missing_reasons: list<string>} */
+    /** @return array{month: string, month_label: string, supplier_name: ?string, rows: list<array<string, mixed>>, totals: array<string, array{chalans: int, quantity: int}>, missing_delivery_count: int, fixture_school_count: int, missing_reasons: list<string>} */
     public function forMonth(string $month): array
     {
         $start = Carbon::createFromFormat('!Y-m', $month)->startOfMonth();
@@ -35,6 +35,7 @@ class FormSevenReportService
         $deliveries = $this->reports
             ->deliveriesForMonth($start->toDateString(), $end->toDateString())
             ->groupBy('school_id');
+        $fixtureQuantities = $this->reports->assessmentFixtureQuantitiesForMonth($month)->keyBy('school_id');
         $recordedDeliveryKeys = $deliveries
             ->flatten(1)
             ->mapWithKeys(static fn ($delivery): array => [
@@ -61,17 +62,32 @@ class FormSevenReportService
         }
         $totals = $this->emptyItems();
         $rows = [];
+        $fixtureSchoolCount = 0;
 
         foreach ($schools as $school) {
             $schoolDeliveries = $deliveries->get($school->id, collect());
+            $fixtureQuantity = $fixtureQuantities->get($school->id);
             $items = $this->emptyItems();
+            $usesFixtureQuantity = $schoolDeliveries->isEmpty() && $fixtureQuantity !== null;
 
-            foreach (['bun' => 'bun_quantity', 'egg' => 'egg_quantity', 'banana' => 'banana_quantity'] as $item => $column) {
-                foreach ($schoolDeliveries as $delivery) {
-                    $quantity = (int) $delivery->{$column};
-                    if ($quantity > 0) {
-                        $items[$item]['chalans']++;
-                        $items[$item]['quantity'] += $quantity;
+            if ($usesFixtureQuantity) {
+                $fixtureSchoolCount++;
+            }
+
+            foreach ([
+                'bun' => ['delivery' => 'bun_quantity', 'fixture' => 'bun_quantity'],
+                'egg' => ['delivery' => 'egg_quantity', 'fixture' => 'egg_quantity'],
+                'banana' => ['delivery' => 'banana_quantity', 'fixture' => 'banana_quantity'],
+            ] as $item => $columns) {
+                if ($usesFixtureQuantity) {
+                    $items[$item]['quantity'] = (int) $fixtureQuantity->{$columns['fixture']};
+                } else {
+                    foreach ($schoolDeliveries as $delivery) {
+                        $quantity = (int) $delivery->{$columns['delivery']};
+                        if ($quantity > 0) {
+                            $items[$item]['chalans']++;
+                            $items[$item]['quantity'] += $quantity;
+                        }
                     }
                 }
 
@@ -79,7 +95,15 @@ class FormSevenReportService
                 $totals[$item]['quantity'] += $items[$item]['quantity'];
             }
 
-            $rows[] = ['school' => $school, ...$items];
+            $quantitySource = $usesFixtureQuantity
+                ? 'assessment_fixture'
+                : ($schoolDeliveries->isNotEmpty() ? 'actual_delivery' : 'missing');
+
+            $rows[] = [
+                'school' => $school,
+                'quantity_source' => $quantitySource,
+                ...$items,
+            ];
         }
 
         $year = substr($month, 2, 2);
@@ -92,6 +116,7 @@ class FormSevenReportService
             'rows' => $rows,
             'totals' => $totals,
             'missing_delivery_count' => $missingDeliveryCount,
+            'fixture_school_count' => $fixtureSchoolCount,
             'missing_reasons' => $missingReasons,
         ];
     }

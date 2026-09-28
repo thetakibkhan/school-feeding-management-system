@@ -39,12 +39,16 @@
             </div>
         @endif
 
-        @if ($form['missing_delivery_count'] > 0)
+        @if ($form['missing_delivery_count'] > 0 || $form['fixture_school_count'] > 0)
             <div class="form-seven-controls" role="status">
                 <div>
-                    <h2>Preview uses currently entered delivery records</h2>
-                    <p>This report is generated from currently entered delivery records. Some scheduled deliveries have not yet been entered.</p>
-                    <p>{{ number_format($form['missing_delivery_count']) }} expected school/date delivery records are missing. Missing records contribute zero to this preview and are not counted as challans.</p>
+                    @if ($form['fixture_school_count'] > 0)
+                        <h2>September assessment/demo fixture deliveries are shown</h2>
+                        <p>{{ number_format($form['fixture_school_count']) }} schools without a real delivery record use the source-backed September demand quantity under the assumption delivered = demand. These fixture values are not Field Staff-entered transactions. Real delivery records take precedence; fixture values never create challans.</p>
+                    @endif
+                    @if ($form['missing_delivery_count'] > 0)
+                        <p>{{ number_format($form['missing_delivery_count']) }} expected school/date delivery records are missing. Missing records remain absent and are not counted as challans.</p>
+                    @endif
                 </div>
             </div>
         @endif
@@ -123,8 +127,13 @@
                         @endforeach
 
                         <div class="form-seven-notes" style="background-color:#fff!important;color:#111!important;">
-                            <p style="background-color:transparent!important;color:#111!important;">উপযুক্ত বিবরণ অনুযায়ী অত্র উপজেলার {{ $number(count($form['rows'])) }} টি সরকারি প্রাথমিক বিদ্যালয়ে {{ $form['month_label'] }} মাসের স্পেসিফিকেশন অনুযায়ী সরবরাহকৃত {{ $number($form['totals']['bun']['quantity']) }} প্যাকেট বনরুটি, {{ $number($form['totals']['egg']['quantity']) }} পিস সিদ্ধ ডিম ও {{ $number($form['totals']['banana']['quantity']) }} পিস কলা সরবরাহের চালানের মূল কপি অত্র কার্যালয়ে সংরক্ষিত আছে।</p>
-                            <p style="background-color:transparent!important;color:#111!important;">এমতাবস্থায়, উক্ত সরবরাহকারী ঠিকাদারকে {{ $form['month_label'] }} মাসের {{ $number($form['totals']['bun']['quantity']) }} প্যাকেট বনরুটি, {{ $number($form['totals']['egg']['quantity']) }} পিস সিদ্ধ ডিম ও {{ $number($form['totals']['banana']['quantity']) }} পিস কলা সরবরাহের বিল পরিশোধ করার সুপারিশ করা হলো।</p>
+                            @if ($form['fixture_school_count'] > 0)
+                                <p style="background-color:transparent!important;color:#111!important;">এই ফরমে প্রদর্শিত সেপ্টেম্বরের assessment/demo fixture পরিমাণসমূহ সরবরাহকৃত চাহিদার পূর্ণ সরবরাহ ধরে (delivered = demand) দেখানো হয়েছে। এগুলো মাঠকর্মীর প্রকৃত এন্ট্রি নয় এবং কোনো চালান তৈরি করে না।</p>
+                                <p style="background-color:transparent!important;color:#111!important;">প্রকৃত সরবরাহ ও চালান যাচাইয়ের আগে এই ফিক্সচার পরিমাণকে প্রকৃত সরবরাহের প্রমাণ হিসেবে ব্যবহার করা যাবে না।</p>
+                            @else
+                                <p style="background-color:transparent!important;color:#111!important;">উপযুক্ত বিবরণ অনুযায়ী অত্র উপজেলার {{ $number(count($form['rows'])) }} টি সরকারি প্রাথমিক বিদ্যালয়ে {{ $form['month_label'] }} মাসের স্পেসিফিকেশন অনুযায়ী সরবরাহকৃত {{ $number($form['totals']['bun']['quantity']) }} প্যাকেট বনরুটি, {{ $number($form['totals']['egg']['quantity']) }} পিস সিদ্ধ ডিম ও {{ $number($form['totals']['banana']['quantity']) }} পিস কলা সরবরাহের চালানের মূল কপি অত্র কার্যালয়ে সংরক্ষিত আছে।</p>
+                                <p style="background-color:transparent!important;color:#111!important;">এমতাবস্থায়, উক্ত সরবরাহকারী ঠিকাদারকে {{ $form['month_label'] }} মাসের {{ $number($form['totals']['bun']['quantity']) }} প্যাকেট বনরুটি, {{ $number($form['totals']['egg']['quantity']) }} পিস সিদ্ধ ডিম ও {{ $number($form['totals']['banana']['quantity']) }} পিস কলা সরবরাহের বিল পরিশোধ করার সুপারিশ করা হলো।</p>
+                            @endif
                         </div>
                     @endif
                 </section>

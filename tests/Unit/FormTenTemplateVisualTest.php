@@ -31,6 +31,7 @@ class FormTenTemplateVisualTest extends TestCase
             ],
             'related_service_unit_price' => '0.000',
             'school_count' => 110,
+            'fixture_school_count' => 0,
             'grand_total_formatted' => '৪৬২',
             'grand_total_words' => 'চার শত বাষট্টি টাকা মাত্র।',
             'chalan_count' => 3,
@@ -74,6 +75,17 @@ class FormTenTemplateVisualTest extends TestCase
         $this->assertStringNotContainsString('৩৭৩৮', $overlayText);
         $this->assertStringNotContainsString('৩৩৬৩৪৭', $overlayText);
         $this->assertStringContainsString('উপর্যুক্ত বিবরণ', $overlayText);
+
+        $fixtureOverlays = (new FormTenTemplate)->overlays([
+            ...$form,
+            'fixture_school_count' => 1,
+        ]);
+        $fixtureNote = $this->fieldAt($fixtureOverlays, 120, 895);
+        $this->assertStringContainsString('assessment/demo fixture', $fixtureNote['text']);
+        $this->assertStringContainsString('delivered = demand', $fixtureNote['text']);
+        $this->assertStringContainsString('মাঠকর্মীর প্রকৃত এন্ট্রি নয়', $fixtureNote['text']);
+        $fixtureAttachment = $this->fieldAt($fixtureOverlays, 120, 729);
+        $this->assertStringContainsString('কোনো কাল্পনিক চালান', $fixtureAttachment['text']);
     }
 
     /** @param list<array{x: int, y: int, width: int, height: int, text: string, font_size: int, bold: bool, align: string, line_height: float, font_family: string}> $overlays

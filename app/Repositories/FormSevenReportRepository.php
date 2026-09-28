@@ -6,6 +6,7 @@ use App\Models\Delivery;
 use App\Models\FoodSchedule;
 use App\Models\OfficialReportPeriod;
 use App\Models\School;
+use App\Models\SchoolMonthlyPlanningQuantity;
 use Illuminate\Database\Eloquent\Collection;
 
 class FormSevenReportRepository
@@ -24,6 +25,14 @@ class FormSevenReportRepository
         return Delivery::query()
             ->whereBetween('date', [$firstDate, $lastDate])
             ->get(['school_id', 'date', 'bun_quantity', 'egg_quantity', 'banana_quantity']);
+    }
+
+    /** @return Collection<int, SchoolMonthlyPlanningQuantity> */
+    public function assessmentFixtureQuantitiesForMonth(string $month): Collection
+    {
+        return SchoolMonthlyPlanningQuantity::query()
+            ->where('month', $month)
+            ->get(['school_id', 'bun_quantity', 'egg_quantity', 'banana_quantity']);
     }
 
     /** @return list<string> */

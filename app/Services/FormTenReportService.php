@@ -6,6 +6,7 @@ use App\Models\Delivery;
 use App\Models\FoodItem;
 use App\Models\FoodSchedule;
 use App\Models\School;
+use App\Models\SchoolMonthlyPlanningQuantity;
 use Illuminate\Support\Carbon;
 
 class FormTenReportService
@@ -46,6 +47,11 @@ class FormTenReportService
             ->whereDate('date', '>=', $start->toDateString())
             ->whereDate('date', '<=', $end->toDateString())
             ->get(['school_id', 'date', 'bun_quantity', 'egg_quantity', 'banana_quantity', 'chalan_number']);
+        $deliveriesBySchool = $deliveries->groupBy('school_id');
+        $fixtureQuantities = SchoolMonthlyPlanningQuantity::query()
+            ->where('month', $month)
+            ->get()
+            ->keyBy('school_id');
 
         $recordedDeliveryKeys = $deliveries->mapWithKeys(static fn (Delivery $delivery): array => [
             $delivery->date->toDateString().':'.$delivery->school_id => true,
@@ -75,10 +81,30 @@ class FormTenReportService
             }
         }
 
-        $delivered = array_fill_keys(array_keys(self::ITEM_COLUMNS), 0);
-        foreach ($deliveries as $delivery) {
-            foreach (self::ITEM_COLUMNS as $key => $column) {
-                $delivered[$key] += (int) $delivery->{$column};
+        $deliveredQuantities = array_fill_keys(array_keys(self::ITEM_COLUMNS), 0);
+        $fixtureSchoolCount = 0;
+        $actualDeliverySchoolCount = 0;
+        foreach ($schools as $school) {
+            $schoolDeliveries = $deliveriesBySchool->get($school->id, collect());
+            $fixtureQuantity = $fixtureQuantities->get($school->id);
+
+            if ($schoolDeliveries->isEmpty() && $fixtureQuantity !== null) {
+                $fixtureSchoolCount++;
+                foreach (self::ITEM_COLUMNS as $key => $column) {
+                    $deliveredQuantities[$key] += (int) $fixtureQuantity->{$column};
+                }
+
+                continue;
+            }
+
+            if ($schoolDeliveries->isNotEmpty()) {
+                $actualDeliverySchoolCount++;
+            }
+
+            foreach ($schoolDeliveries as $delivery) {
+                foreach (self::ITEM_COLUMNS as $key => $column) {
+                    $deliveredQuantities[$key] += (int) $delivery->{$column};
+                }
             }
         }
 
@@ -88,7 +114,7 @@ class FormTenReportService
         foreach (self::ITEM_COLUMNS as $key => $column) {
             $item = $items->get($key);
             $price = $item?->unit_price;
-            $lineTotalMills = $price === null ? null : $delivered[$key] * $this->priceToMills((string) $price);
+            $lineTotalMills = $price === null ? null : $deliveredQuantities[$key] * $this->priceToMills((string) $price);
             if ($lineTotalMills !== null) {
                 $grandTotalMills += $lineTotalMills;
             } else {
@@ -98,7 +124,7 @@ class FormTenReportService
             $formItems[$key] = [
                 'daily_demand' => $dailyDemand[$key],
                 'distribution_days' => $distributionDays[$key],
-                'delivered_quantity' => $delivered[$key],
+                'delivered_quantity' => $deliveredQuantities[$key],
                 'unit_price' => $price === null ? null : number_format((float) $price, 3, '.', ''),
                 'line_total' => $lineTotalMills === null ? null : $this->formatTenths($lineTotalMills),
             ];
@@ -107,7 +133,12 @@ class FormTenReportService
         $period = $this->invoiceNumbers->ensureForMonth($month);
 
         if ($missingDeliveryCount > 0) {
-            $warnings[] = 'This report is generated from currently entered delivery records. Some scheduled deliveries have not yet been entered.';
+            $warnings[] = $fixtureSchoolCount > 0
+                ? 'Some scheduled deliveries have not yet been entered; assessment/demo fixture deliveries are shown for schools without actual monthly delivery records.'
+                : 'This report is generated from currently entered delivery records. Some scheduled deliveries have not yet been entered.';
+        }
+        if ($fixtureSchoolCount > 0) {
+            $warnings[] = 'September source-backed demand quantities are used as assessment/demo fixture deliveries under the assumption delivered = demand for '.$fixtureSchoolCount.' schools without actual monthly delivery records. They are not Field Staff-entered transactions and do not create chalan records; actual monthly delivery records take precedence.';
         }
         foreach ([
             'invoice_date' => 'Invoice date',
@@ -148,6 +179,14 @@ class FormTenReportService
             'period' => $period,
             'supplier_name' => $period->supplier_name,
             'school_count' => $schools->count(),
+            'fixture_school_count' => $fixtureSchoolCount,
+            'actual_delivery_school_count' => $actualDeliverySchoolCount,
+            'quantity_source' => match (true) {
+                $fixtureSchoolCount > 0 && $actualDeliverySchoolCount > 0 => 'mixed_actual_and_assessment_fixture',
+                $fixtureSchoolCount > 0 => 'assessment_fixture',
+                $actualDeliverySchoolCount > 0 => 'actual_deliveries',
+                default => 'missing',
+            },
             'items' => $formItems,
             'related_service_unit_price' => $period->related_service_unit_price,
             'grand_total' => $grandTotal,

@@ -45,6 +45,8 @@ The supplied Anwara source files provide real EMIS codes but no official school-
 
 The September Daily Demand PDF has both a distribution sequence number and an actual calendar-date column. Its 21 listed date/item rows are seeded exactly, totaling 16 Bun, 12 Boiled Egg, and 5 Banana days. Dates absent from the table are not inferred as holidays or working dates.
 
+For September 2026 report-generation demonstration, supplied demand quantities are used as assessment fixture deliveries assuming full fulfillment (delivered = demand), because actual delivery transactions were not supplied. The source-backed quantities are seeded separately for all 110 schools, totaling 317,664 Bun packets, 238,248 Egg pieces, and 99,270 Banana pieces. Real delivery records take precedence for a school when present; otherwise that school's fixture quantities are used. Fixture quantities are clearly marked as assessment/demo data and are not represented as Field Staff-entered transactions. No delivery or chalan records, chalan numbers/photos, stock values, invoice metadata, or other missing facts are created from these fixtures. Form 7 chalan counts come only from actual delivery records.
+
 The supplied 120g Bun, 60g Boiled Egg, and 100g Banana values are per-item unit-weight specifications. Daily demand remains the effective beneficiary count for each item scheduled on an Admin-configured working date; unit weight is not a demand multiplier.
 
 ### Chalan photo storage

@@ -57,6 +57,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->call(AnwaraSchoolSeeder::class);
+        $this->call(SeptemberSchoolPlanningQuantitySeeder::class);
         $this->call(SchoolPrincipalContactSeeder::class);
         $this->call(DemandSetupSeeder::class);
         $this->call(OfficialReportPeriodSeeder::class);

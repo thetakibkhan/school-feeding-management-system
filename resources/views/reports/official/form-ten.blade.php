@@ -68,13 +68,17 @@
 
         @if ($form['warnings'] !== [])
             <section class="form-ten-warning" role="status">
-                <h2>Some report values are missing</h2>
+                <h2>{{ $form['fixture_school_count'] > 0 ? 'Assessment/demo fixture deliveries are shown' : 'Some report values are missing' }}</h2>
                 <ul>
                     @foreach ($form['warnings'] as $warning)
                         <li>{{ $warning }}</li>
                     @endforeach
                 </ul>
-                <p>Missing delivery rows contribute zero to the current aggregation; they are not stored or counted as challans.</p>
+                @if ($form['fixture_school_count'] > 0)
+                    <p>For {{ number_format($form['fixture_school_count']) }} schools without a real delivery record, source-backed September demand is used as an assessment/demo fixture under the assumption delivered = demand. These are not Field Staff-entered transactions, create no challans, and are overridden by real delivery records.</p>
+                @else
+                    <p>Missing delivery rows remain absent and are not counted as challans.</p>
+                @endif
             </section>
         @endif
 

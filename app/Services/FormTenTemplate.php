@@ -25,17 +25,30 @@ class FormTenTemplate
         $schoolCount = FormSevenReportService::bengaliDigits((string) $form['school_count']);
         $grandTotal = $form['grand_total_formatted'];
         $grandTotalWords = (string) $form['grand_total_words'];
+        $isAssessmentFixture = $form['fixture_school_count'] > 0;
+        $quantitySourceNote = $isAssessmentFixture
+            ? 'সেপ্টেম্বরের assessment/demo fixture পরিমাণসমূহ সরবরাহকৃত চাহিদার পূর্ণ সরবরাহ ধরে (delivered = demand) দেখানো হয়েছে; এগুলো মাঠকর্মীর প্রকৃত এন্ট্রি নয়।'
+            : 'উপর্যুক্ত বিবরণ অনুযায়ী অত্র উপজেলার '.$schoolCount.' টি সরকারি প্রাথমিক বিদ্যালয়ে '.$month.' মাসের স্পেসিফিকেশন অনুযায়ী বনরুটি, সিদ্ধ ডিম ও কলা সরবরাহের '.$chalanCount.' টি চালানের কপি অত্র কার্যালয়ে সংরক্ষিত আছে। নিম্ন স্বাক্ষরকারী কর্তৃক স্বাক্ষরিত ফরম নম্বর ৭ ও ফরম নম্বর ১৩ এতদসঙ্গে প্রেরণ করা হলো।';
+        $paymentNote = $isAssessmentFixture
+            ? 'assessment/demo fixture পরিমাণের ভিত্তিতে হিসাব করা '.$grandTotal.'/- টাকা; প্রকৃত সরবরাহ যাচাই না হওয়া পর্যন্ত এটি প্রকৃত পরিশোধযোগ্য বিল নয়।'
+            : 'এমতাবস্থায়, উক্ত ঠিকাদারকে '.$month.' মাসের '.$quantity('bun').' প্যাকেট বনরুটি, '.$quantity('boiled_egg').' পিস সিদ্ধ ডিম ও '.$quantity('banana').' পিস কলা সরবরাহের '.$grandTotal.'/- টাকার বিল পরিশোধ করার সুপারিশ করা হলো।';
+        $billRequest = $isAssessmentFixture
+            ? 'ডেমো ফিক্সচার পরিমাণ প্রকৃত সরবরাহ হিসেবে ব্যবহার করার আগে যাচাই করতে হবে।'
+            : 'বর্ণিত '.$grandTotal.'/- টাকার বিল প্রদানের জন্য অনুরোধ করা হলো';
+        $attachmentNote = $isAssessmentFixture
+            ? 'ডেমো ফিক্সচার পরিমাণের সঙ্গে কোনো কাল্পনিক চালান যুক্ত করা হয়নি।'
+            : 'সংযুক্তি: এই বিল সম্পর্কিত '.$chalanCount.' টি চালানের মূল কপি।';
 
         $fields = [
             $this->field(208, 240, 180, 20, (string) ($period->invoice_number ?? ''), 18, false, 'left'),
             $this->field(825, 240, 160, 20, $this->date($period->invoice_date), 18, false, 'left'),
             $this->field(183, 398, 220, 20, (string) ($period->contract_number ?? ''), 18, false, 'left'),
             $this->field(120, 424, 820, 28, 'বিষয়: আনোয়ারা উপজেলার '.$month.' মাসের বনরুটি, সিদ্ধ ডিম ও কলা সরবরাহের বিক্রয় ইনভয়েস।', 17, false, 'left'),
-            $this->field(120, 895, 794, 65, 'উপর্যুক্ত বিবরণ অনুযায়ী অত্র উপজেলার '.$schoolCount.' টি সরকারি প্রাথমিক বিদ্যালয়ে '.$month.' মাসের স্পেসিফিকেশন অনুযায়ী বনরুটি, সিদ্ধ ডিম ও কলা সরবরাহের '.$chalanCount.' টি, চালানের কপি অত্র কার্যালয়ে সংরক্ষিত আছে। নিম্ন স্বাক্ষরকারী কর্তৃক স্বাক্ষরিত ফরম নম্বর ৭ ও ফরম নম্বর ১৩ এতদসঙ্গে প্রেরণ করা হলো।', 17, false, 'left', 1.26),
-            $this->field(120, 963, 801, 44, 'এমতাবস্থায়, উক্ত ঠিকাদারকে '.$month.' মাসের '.$quantity('bun').' প্যাকেট বনরুটি, '.$quantity('boiled_egg').' পিস সিদ্ধ ডিম ও '.$quantity('banana').' পিস কলা সরবরাহের '.$grandTotal.'/- টাকার বিল পরিশোধ করার সুপারিশ করা হলো।', 17, false, 'left', 1.26),
+            $this->field(120, 895, 794, 65, $quantitySourceNote, 17, false, 'left', 1.26),
+            $this->field(120, 963, 801, 44, $paymentNote, 17, false, 'left', 1.26),
             $this->field(120, 678, 794, 20, '', 17, false, 'left'),
-            $this->field(120, 703, 794, 20, 'বর্ণিত '.$grandTotal.'/- টাকার বিল প্রদানের জন্য অনুরোধ করা হলো', 17, false, 'left'),
-            $this->field(120, 729, 794, 20, 'সংযুক্তি: এই বিল সম্পর্কিত '.$chalanCount.' টি চালানের মূল কপি।', 17, false, 'left'),
+            $this->field(120, 703, 794, 20, $billRequest, 17, false, 'left'),
+            $this->field(120, 729, 794, 20, $attachmentNote, 17, false, 'left'),
             $this->field(216, 779, 314, 20, (string) ($period->bank_account_name ?? ''), 18, false, 'left'),
             $this->field(206, 800, 324, 20, (string) ($period->bank_account_number ?? ''), 18, false, 'left'),
             $this->field(213, 822, 317, 20, (string) ($period->bank_name ?? ''), 18, false, 'left'),
@@ -53,8 +66,8 @@ class FormTenTemplate
             $fields[] = $this->field(808, $top + 3, 95, 24, $lineTotal($key), 18, false, 'right');
         }
 
-        $fields[] = $this->field(484, 657, 95, 18, $grandTotal, 18, true, 'right');
-        $fields[] = $this->field(808, 657, 95, 18, $grandTotal, 18, true, 'right');
+        $fields[] = $this->field(484, 657, 95, 18, $grandTotal, 16, true, 'right');
+        $fields[] = $this->field(808, 657, 95, 18, $grandTotal, 16, true, 'right');
         $fields[] = $this->field(120, 682, 794, 21, 'কথায়: '.$grandTotalWords, 17, true, 'left');
 
         return $fields;

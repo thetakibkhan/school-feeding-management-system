@@ -8,12 +8,15 @@ use App\Models\FoodSchedule;
 use App\Models\NonWorkingDate;
 use App\Models\OfficialReportPeriod;
 use App\Models\School;
+use App\Models\SchoolMonthlyPlanningQuantity;
 use App\Models\SchoolStudentCount;
 use App\Models\User;
 use App\Services\FormTenInvoiceNumberGenerator;
 use App\Services\FormTenReportService;
+use Database\Seeders\AnwaraSchoolSeeder;
 use Database\Seeders\DemandSetupSeeder;
 use Database\Seeders\OfficialReportPeriodSeeder;
+use Database\Seeders\SeptemberSchoolPlanningQuantitySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,11 +24,21 @@ class FormTenReportTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_september_form_ten_uses_source_prices_and_actual_delivery_quantities(): void
+    public function test_real_september_delivery_quantities_override_assessment_fixture_quantities(): void
     {
         $this->seed([DemandSetupSeeder::class, OfficialReportPeriodSeeder::class]);
         $firstSchool = $this->school('AN-001', '11111111111', 100);
         $secondSchool = $this->school('AN-002', '22222222222', 200);
+        foreach ([$firstSchool, $secondSchool] as $school) {
+            SchoolMonthlyPlanningQuantity::query()->create([
+                'school_id' => $school->id,
+                'month' => '2026-09',
+                'bun_quantity' => 1000,
+                'egg_quantity' => 1000,
+                'banana_quantity' => 1000,
+                'source_document' => 'GPSFP_School List_Anwara Upazila.pdf',
+            ]);
+        }
         $staff = User::factory()->create(['role' => UserRole::FieldStaff]);
         $this->delivery($firstSchool, $staff, '2026-09-02', 100, 10, 0);
         $this->delivery($secondSchool, $staff, '2026-09-02', 50, 10, 0);
@@ -50,9 +63,71 @@ class FormTenReportTest extends TestCase
         ], $form['items']['boiled_egg']);
         $this->assertSame(3703, $form['grand_total']);
         $this->assertSame(2, $form['chalan_count']);
+        $this->assertSame(0, $form['fixture_school_count']);
+        $this->assertSame('actual_deliveries', $form['quantity_source']);
         $this->assertDatabaseCount('deliveries', 2);
         $this->assertSame(21, FoodSchedule::query()->count());
         $this->assertSame(0, NonWorkingDate::query()->count());
+    }
+
+    public function test_september_fixture_quantities_are_assumed_delivered_without_fabricating_chalans(): void
+    {
+        $this->seed([DemandSetupSeeder::class, OfficialReportPeriodSeeder::class]);
+        $school = $this->school('AN-001', '11111111111', 100);
+        SchoolMonthlyPlanningQuantity::query()->create([
+            'school_id' => $school->id,
+            'month' => '2026-09',
+            'bun_quantity' => 160,
+            'egg_quantity' => 120,
+            'banana_quantity' => 50,
+            'source_document' => 'GPSFP_School List_Anwara Upazila.pdf',
+        ]);
+
+        $form = app(FormTenReportService::class)->forMonth('2026-09');
+
+        $this->assertSame(1, $form['fixture_school_count']);
+        $this->assertSame('assessment_fixture', $form['quantity_source']);
+        $this->assertSame(160, $form['items']['bun']['delivered_quantity']);
+        $this->assertSame(120, $form['items']['boiled_egg']['delivered_quantity']);
+        $this->assertSame(50, $form['items']['banana']['delivered_quantity']);
+        $this->assertSame(0, $form['chalan_count']);
+        $this->assertStringContainsString('delivered = demand', implode(' ', $form['warnings']));
+        $this->assertDatabaseCount('deliveries', 0);
+        $this->assertNull($form['period']->invoice_date);
+        $this->assertNull($form['period']->contract_number);
+        $this->assertNull($form['period']->bank_account_number);
+
+        $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
+            ->get(route('admin.reports.form-ten', ['month' => '2026-09']))
+            ->assertOk()
+            ->assertSee('assessment/demo fixture', false)
+            ->assertSee('delivered = demand', false)
+            ->assertSee('not Field Staff-entered transactions', false);
+    }
+
+    public function test_seeded_september_assessment_fixtures_populate_form_ten_from_source_totals(): void
+    {
+        $this->seed([
+            AnwaraSchoolSeeder::class,
+            DemandSetupSeeder::class,
+            OfficialReportPeriodSeeder::class,
+            SeptemberSchoolPlanningQuantitySeeder::class,
+        ]);
+
+        $form = app(FormTenReportService::class)->forMonth('2026-09');
+
+        $this->assertSame(110, $form['fixture_school_count']);
+        $this->assertSame('assessment_fixture', $form['quantity_source']);
+        $this->assertSame(317664, $form['items']['bun']['delivered_quantity']);
+        $this->assertSame(238248, $form['items']['boiled_egg']['delivered_quantity']);
+        $this->assertSame(99270, $form['items']['banana']['delivered_quantity']);
+        $this->assertSame(0, $form['chalan_count']);
+        $this->assertDatabaseCount('deliveries', 0);
+
+        $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
+            ->get(route('admin.reports.form-ten.pdf', ['month' => '2026-09']))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
     }
 
     public function test_admin_can_preview_and_download_form_ten_with_missing_data_warning_outside_the_form(): void

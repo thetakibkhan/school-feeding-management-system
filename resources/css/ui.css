@@ -396,7 +396,7 @@ button:disabled { cursor: not-allowed; }
 .editable-table-search button,
 .demand-setup__filter button,
 .demand-setup__inline-form button,
-.daily-report__button,
+.daily-report__button:not(.daily-report__button--secondary),
 .clean-signin-submit {
     color: var(--ui-on-accent);
 }

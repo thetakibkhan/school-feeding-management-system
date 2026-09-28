@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\UserManagementService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 class UserManagementController extends Controller
@@ -24,16 +25,33 @@ class UserManagementController extends Controller
         return view('admin.users.create', ['roles' => UserRole::cases()]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|Response
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'in:admin,field_staff'],
+            'whatsapp_number' => ['nullable', 'required_if:role,field_staff', 'string', 'regex:/^\\+[1-9][0-9]{7,14}$/'],
         ]);
 
-        $this->users->createUser($data['name'], $data['email'], $data['password'], UserRole::from($data['role']));
+        $user = $this->users->createUser($data['name'], $data['email'], $data['password'], UserRole::from($data['role']));
+
+        if ($user->role === UserRole::FieldStaff && isset($data['whatsapp_number'])) {
+            $message = implode("\n", [
+                'Hello '.$user->name.', your Prottyashi SFP staff account has been created.',
+                'Username: '.$user->email,
+                'Password: '.$data['password'],
+                'Sign in: https://thetakibkhan.alwaysdata.net',
+                'Please keep these login details private.',
+            ]);
+            $phoneNumber = ltrim($data['whatsapp_number'], '+');
+
+            return response()->view('admin.users.created', [
+                'staffName' => $user->name,
+                'whatsappUrl' => 'https://wa.me/'.$phoneNumber.'?text='.rawurlencode($message),
+            ])->header('Cache-Control', 'no-store, private');
+        }
 
         return to_route('admin.users.index')->with('status', 'User created.');
     }

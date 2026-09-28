@@ -60,6 +60,18 @@ body,
     background: var(--ui-background);
 }
 
+button:not([class]) {
+    border: 1px solid var(--ui-accent);
+    border-radius: 0.55rem;
+    padding: 0.55rem 0.8rem;
+    color: var(--ui-on-accent);
+    background: var(--ui-accent);
+    cursor: pointer;
+    font: inherit;
+}
+
+button:disabled { cursor: not-allowed; }
+
 .theme-toggle {
     position: fixed;
     right: 1rem;
@@ -187,7 +199,7 @@ body,
 .user-status--active { color: var(--ui-success); background: var(--ui-success-soft); }
 .user-status--inactive { color: var(--ui-danger); background: var(--ui-danger-soft); }
 .editable-table__actions a, .delivery-table td a { color: var(--ui-accent-hover); }
-.editable-table__actions button { color: var(--ui-danger); }
+.editable-table__actions button { border: 0; padding: 0; color: var(--ui-danger); background: transparent; }
 
 .editable-table-search input,
 .editable-table-count strong,
@@ -205,6 +217,7 @@ body,
 .editable-table td { border-color: var(--ui-line); }
 .editable-table th button span,
 .editable-table-empty { color: var(--ui-muted); }
+.editable-table th button { padding: 0; }
 
 .editable-table tbody tr:hover,
 .editable-table tbody tr.is-selected { background: #f0f0f0; }
@@ -348,7 +361,15 @@ body,
 .clean-signin-divider { color: var(--ui-muted); }
 .clean-signin-divider::before, .clean-signin-divider::after { border-color: var(--ui-line); }
 .clean-signin-socials button { border-color: var(--ui-line); color: var(--ui-muted); background: var(--ui-surface-secondary); }
+.clean-signin-socials button { padding: 0; }
 .clean-signin-error { color: var(--ui-danger); background: var(--ui-danger-soft); }
+.user-created-page { display: grid; min-height: calc(100vh - 4rem); place-items: center; padding: 2rem 1rem; }
+.user-created-card { width: min(100%, 34rem); border: 1px solid var(--ui-line); border-radius: 1rem; padding: clamp(1.25rem, 4vw, 2rem); color: var(--ui-ink); background: var(--ui-surface); box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 8%); }
+.user-created-card h1 { margin: 0.35rem 0 0.75rem; font-size: clamp(1.35rem, 5vw, 1.8rem); }
+.user-created-card > p:not(.dashboard-eyebrow) { color: var(--ui-muted); line-height: 1.55; }
+.user-created-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1.5rem; }
+.user-created-back { color: var(--ui-accent-hover); font-weight: 650; text-decoration: none; }
+.user-created-back:hover { text-decoration: underline; }
 
 :root[data-theme="dark"] .dashboard-sidebar,
 :root[data-theme="dark"] .dashboard-topbar {

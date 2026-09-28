@@ -14,6 +14,24 @@ document.addEventListener('click', (event) => {
     button.setAttribute('aria-pressed', String(showingPassword));
 });
 
+document.querySelectorAll('[data-user-create-form]').forEach((form) => {
+    const roleInput = form.querySelector('[data-user-role]');
+    const whatsappField = form.querySelector('[data-whatsapp-field]');
+    const whatsappInput = form.querySelector('[name="whatsapp_number"]');
+
+    if (!(roleInput instanceof HTMLSelectElement) || !(whatsappField instanceof HTMLElement) || !(whatsappInput instanceof HTMLInputElement)) return;
+
+    const updateWhatsappField = () => {
+        const isFieldStaff = roleInput.value === 'field_staff';
+        whatsappField.hidden = !isFieldStaff;
+        whatsappInput.disabled = !isFieldStaff;
+        whatsappInput.required = isFieldStaff;
+    };
+
+    roleInput.addEventListener('change', updateWhatsappField);
+    updateWhatsappField();
+});
+
 const themeToggleButtons = document.querySelectorAll('[data-theme-toggle]');
 const setTheme = (theme, persist = false) => {
     document.documentElement.dataset.theme = theme;

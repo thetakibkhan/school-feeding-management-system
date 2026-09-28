@@ -1,5 +1,21 @@
 import { mountBeamsBackground } from './beams-background';
 
+document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+    const button = event.target.closest('[data-password-toggle]');
+    if (!(button instanceof HTMLButtonElement)) return;
+
+    const inputId = button.getAttribute('aria-controls');
+    const input = inputId ? document.getElementById(inputId) : null;
+    if (!(input instanceof HTMLInputElement)) return;
+
+    const showingPassword = input.type === 'password';
+    input.type = showingPassword ? 'text' : 'password';
+    button.textContent = showingPassword ? 'Hide' : 'Show';
+    button.setAttribute('aria-label', `${showingPassword ? 'Hide' : 'Show'} password`);
+    button.setAttribute('aria-pressed', String(showingPassword));
+});
+
 const themeToggleButtons = document.querySelectorAll('[data-theme-toggle]');
 const setTheme = (theme, persist = false) => {
     document.documentElement.dataset.theme = theme;

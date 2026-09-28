@@ -33,6 +33,7 @@
             <div class="clean-signin-input-wrap">
                 <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>
                 <input id="password" name="password" type="password" placeholder="Password" autocomplete="current-password" required>
+                <button class="password-toggle-button" type="button" data-password-toggle aria-controls="password" aria-label="Show password" aria-pressed="false">Show</button>
             </div>
             <div class="clean-signin-options">
                 <label class="clean-signin-remember" for="remember"><input id="remember" name="remember" type="checkbox" value="1"> Remember me</label>

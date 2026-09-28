@@ -1,7 +1,6 @@
 :root { --dashboard-ink: var(--ui-ink, #1d1d1f); --dashboard-muted: var(--ui-muted, #6e6e73); --dashboard-line: var(--ui-line, #d2d2d7); --dashboard-surface: var(--ui-surface, #fff); --dashboard-bg: var(--ui-background, #f5f5f7); --dashboard-accent: var(--ui-accent, #007aff); }
 .app-shell { position: relative; min-height: 100vh; overflow: hidden; background: var(--ui-background, #f5f5f7); }
 .app-shell__background { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-.app-shell__background > .beams-background { min-height: 100%; }
 .app-shell__content { position: relative; z-index: 1; }
 .dashboard-shell { overflow: visible; color: var(--dashboard-ink); background: transparent; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
 .dashboard-shell__layout { display: flex; min-height: 100vh; }

@@ -24,7 +24,7 @@
 }
 
 .form-four-warning {
-    border: 1px solid #e5c36a;
+    border: 1px solid var(--ui-line, #d0d0d0);
     border-radius: 12px;
     background: var(--ui-warning-soft, #fff5dc);
     color: var(--ui-warning, #8a5a00);

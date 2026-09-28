@@ -63,14 +63,14 @@
     </x-dashboard-shell>
     <style>
         .stock-info-form{display:flex;flex-wrap:wrap;align-items:end;gap:1rem;margin:1rem 0}
-        .stock-info-form label{display:grid;gap:.35rem;min-width:12rem;flex:1;color:#ddd}
-        .stock-info-form input{width:100%;padding:.6rem;border:1px solid #394052;border-radius:.55rem;background:#151820;color:#fff}
-        .stock-info-form button,.stock-info-preview{display:inline-block;padding:.7rem 1rem;border:0;border-radius:.6rem;background:#3411c6;color:white;text-decoration:none;cursor:pointer}
-        .stock-info-note{color:#c6c8d0;line-height:1.5}
+        .stock-info-form label{display:grid;gap:.35rem;min-width:12rem;flex:1;color:var(--ui-muted)}
+        .stock-info-form input{width:100%;padding:.6rem;border:1px solid var(--ui-line);border-radius:.55rem;background:var(--ui-surface);color:var(--ui-ink)}
+        .stock-info-form button,.stock-info-preview{display:inline-block;padding:.7rem 1rem;border:0;border-radius:.6rem;background:var(--ui-accent);color:var(--ui-on-accent);text-decoration:none;cursor:pointer}
+        .stock-info-note{color:var(--ui-muted);line-height:1.5}
         .form-thirteen-metadata{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.8rem;margin:1.25rem 0}
-        .form-thirteen-metadata div{padding:.8rem 1rem;border:1px solid #303544;border-radius:.65rem;background:#171a22}
-        .form-thirteen-metadata dt{color:#aeb3c2;font-size:.82rem}
-        .form-thirteen-metadata dd{margin:.35rem 0 0;color:#fff}
+        .form-thirteen-metadata div{padding:.8rem 1rem;border:1px solid var(--ui-line);border-radius:.65rem;background:var(--ui-surface)}
+        .form-thirteen-metadata dt{color:var(--ui-muted);font-size:.82rem}
+        .form-thirteen-metadata dd{margin:.35rem 0 0;color:var(--ui-ink)}
         @media(max-width:520px){.stock-info-form{align-items:stretch;flex-direction:column}.stock-info-form label{min-width:0;width:100%}.stock-info-form button,.stock-info-preview{width:100%;text-align:center}.form-thirteen-metadata{grid-template-columns:minmax(0,1fr)}}
     </style>
 </body>

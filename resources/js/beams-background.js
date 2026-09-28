@@ -8,20 +8,21 @@ function createBeam(width, height) {
         length: height * 2.5,
         angle: -35 + Math.random() * 10,
         speed: 0.6 + Math.random() * 1.2,
-        opacity: 0.12 + Math.random() * 0.08,
-        hue: 218 + Math.random() * 18,
+        opacity: 0.12 + Math.random() * 0.16,
         pulse: Math.random() * Math.PI * 2,
         pulseSpeed: 0.02 + Math.random() * 0.03,
     };
 }
 
-function drawBeam(context, beam, intensity) {
+function drawBeam(context, beam, intensity, theme) {
     context.save();
     context.translate(beam.x, beam.y);
     context.rotate((beam.angle * Math.PI) / 180);
 
     const opacity = beam.opacity * (0.8 + Math.sin(beam.pulse) * 0.2) * intensityOpacity[intensity];
-    const color = (alpha) => `hsla(${beam.hue}, 18%, 24%, ${alpha})`;
+    const color = (alpha) => theme === 'dark'
+        ? `rgba(255, 255, 255, ${alpha})`
+        : `rgba(0, 0, 0, ${alpha})`;
     const gradient = context.createLinearGradient(0, 0, 0, beam.length);
 
     gradient.addColorStop(0, color(0));
@@ -36,14 +37,13 @@ function drawBeam(context, beam, intensity) {
     context.restore();
 }
 
-function resetBeam(beam, index, totalBeams, width, height) {
+function resetBeam(beam, index, width, height) {
     const spacing = width / 3;
     beam.y = height + 100;
     beam.x = (index % 3) * spacing + spacing / 2 + (Math.random() - 0.5) * spacing * 0.5;
     beam.width = 100 + Math.random() * 100;
     beam.speed = 0.5 + Math.random() * 0.4;
-    beam.hue = 218 + (index * 18) / totalBeams;
-    beam.opacity = 0.12 + Math.random() * 0.08;
+    beam.opacity = 0.2 + Math.random() * 0.1;
 }
 
 export function mountBeamsBackground(element, intensity = 'strong') {
@@ -70,13 +70,14 @@ export function mountBeamsBackground(element, intensity = 'strong') {
     const animate = () => {
         const width = window.innerWidth;
         const height = window.innerHeight;
+        const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
         context.clearRect(0, 0, width, height);
         context.filter = 'blur(35px)';
         beams.forEach((beam, index) => {
             beam.y -= beam.speed;
             beam.pulse += beam.pulseSpeed;
-            if (beam.y + beam.length < -100) resetBeam(beam, index, beams.length, width, height);
-            drawBeam(context, beam, intensity);
+            if (beam.y + beam.length < -100) resetBeam(beam, index, width, height);
+            drawBeam(context, beam, intensity, theme);
         });
         animationFrame = window.requestAnimationFrame(animate);
     };

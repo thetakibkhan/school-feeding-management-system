@@ -77,7 +77,7 @@
 
 .form-ten-notice {
     padding: 0.75rem 1rem;
-    border: 1px solid #a8d5af;
+    border: 1px solid var(--ui-line, #d0d0d0);
     border-radius: 0.75rem;
     background: var(--ui-success-soft, #e7f5e9);
     color: var(--ui-success, #248a3d);
@@ -85,7 +85,7 @@
 
 .form-ten-warning {
     padding: 1rem 1.25rem;
-    border: 1px solid #e5c36a;
+    border: 1px solid var(--ui-line, #d0d0d0);
     border-radius: 0.9rem;
     background: var(--ui-warning-soft, #fff5dc);
     color: var(--ui-warning, #8a5a00);

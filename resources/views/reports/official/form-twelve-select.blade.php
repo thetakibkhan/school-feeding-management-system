@@ -36,7 +36,7 @@
         </section>
     </x-dashboard-shell>
     <style>
-        .form-twelve-selection{display:flex;flex-wrap:wrap;align-items:end;gap:1rem}.form-twelve-selection label{color:#ddd}.form-twelve-selection select{min-width:20rem;max-width:100%;padding:.6rem;border:1px solid #394052;border-radius:.55rem;background:#151820;color:#fff}
+        .form-twelve-selection{display:flex;flex-wrap:wrap;align-items:end;gap:1rem}.form-twelve-selection label{color:var(--ui-muted)}.form-twelve-selection select{min-width:20rem;max-width:100%;padding:.6rem;border:1px solid var(--ui-line);border-radius:.55rem;background:var(--ui-surface);color:var(--ui-ink)}
         @media(max-width:520px){.form-twelve-selection{align-items:stretch;flex-direction:column}.form-twelve-selection select{width:100%;min-width:0}.form-twelve-selection button{width:100%}}
     </style>
 </body>

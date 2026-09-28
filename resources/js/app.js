@@ -1,5 +1,3 @@
-import { mountBeamsBackground } from './beams-background';
-
 document.addEventListener('click', (event) => {
     if (!(event.target instanceof Element)) return;
     const button = event.target.closest('[data-password-toggle]');
@@ -27,7 +25,7 @@ const setTheme = (theme, persist = false) => {
         button.setAttribute('aria-label', label);
         button.setAttribute('title', label);
         const icon = button.querySelector('[data-theme-icon]');
-        if (icon) icon.textContent = nextTheme === 'dark' ? '☾' : '☀';
+        if (icon) icon.textContent = nextTheme === 'dark' ? '☾' : '◐';
     });
 
     if (persist) {
@@ -81,10 +79,6 @@ if (dashboardShell) {
         }
     });
 }
-
-document.querySelectorAll('[data-beams-background]').forEach((element) => {
-    mountBeamsBackground(element, element.dataset.intensity || 'strong');
-});
 
 document.querySelectorAll('[data-editable-table]').forEach((table) => {
     const rows = [...table.querySelectorAll('[data-table-row]')];

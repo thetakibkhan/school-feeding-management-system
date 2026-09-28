@@ -44,7 +44,7 @@
     background: var(--ui-surface, #fff);
     color: var(--ui-ink, #1d1d1f);
 }
-.form-seven-controls button { cursor: pointer; background: var(--ui-accent, #007aff); border-color: var(--ui-accent, #007aff); color: #fff; }
+.form-seven-controls button { cursor: pointer; background: var(--ui-accent, #171717); border-color: var(--ui-accent, #171717); color: var(--ui-on-accent, #fff); }
 
 .form-seven-sheets { display: grid; gap: 20px; justify-items: center; }
 .form-seven-page {

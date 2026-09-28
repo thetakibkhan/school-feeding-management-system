@@ -27,10 +27,10 @@
                 <div class="user-management__notice user-management__notice--error" role="alert">{{ $errors->first() }}</div>
             @endif
 
-            <section class="editable-table-card demand-setup__card">
+            <section class="editable-table-card demand-setup__card demand-setup__exception-card">
                     <div class="school-detail-card__heading"><div><p class="dashboard-eyebrow">Calendar exception</p><h3>Non-working dates</h3></div></div>
                     <div class="demand-setup__body">
-                        <form class="demand-setup__form" method="POST" action="{{ route('admin.demand-setup.non-working-dates.store') }}">
+                        <form class="demand-setup__form demand-setup__exception-form" method="POST" action="{{ route('admin.demand-setup.non-working-dates.store') }}">
                             @csrf
                             <label>Date <input type="date" name="date" value="{{ old('date') }}" required></label>
                             <label>Reason (optional) <input type="text" name="reason" value="{{ old('reason') }}" maxlength="255"></label>

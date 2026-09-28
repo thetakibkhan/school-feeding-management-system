@@ -13,9 +13,6 @@
         <a href="{{ route('admin.reports.stock.information', ['form' => $form, 'month' => $month, 'school_id' => $schoolId]) }}">{{ $form === '12' ? 'Report selection' : 'Report information' }}</a>
         @if ($form === '12' || $form === '13' || $ready)
             <button type="button" onclick="window.print()">Print</button>
-            @if ($form === '13')
-                <a href="{{ route('admin.reports.stock.pdf', ['form' => $form, 'month' => $month]) }}">Download PDF</a>
-            @endif
             @if ($form === '12' && ! $ready)
                 <span role="alert">Some Form 12 data is missing. This preview uses saved records only; unknown values are left blank. Missing scheduled delivery entries: {{ $missingDeliveryCount }}. Printing is available.</span>
             @elseif ($form === '13' && ! $ready)

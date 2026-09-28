@@ -142,7 +142,7 @@ class StockFormsTest extends TestCase
             ->assertOk()
             ->assertSee('official-page')
             ->assertSee('window.print()')
-            ->assertSee('Download PDF')
+            ->assertDontSee('Download PDF')
             ->assertSee('Some Form 12 data is missing');
 
         $this->assertNotEmpty($preview->getContent());
@@ -193,7 +193,7 @@ class StockFormsTest extends TestCase
             ->assertOk()
             ->assertSee('Some Form 13 data is incomplete')
             ->assertSee('window.print()')
-            ->assertSee('Download PDF');
+            ->assertDontSee('Download PDF');
         $pdf = $this->get(route('admin.reports.stock.pdf', ['form' => 13, 'month' => '2026-09']))
             ->assertOk()
             ->assertHeader('content-type', 'application/pdf');

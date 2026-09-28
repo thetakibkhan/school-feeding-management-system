@@ -23,7 +23,7 @@ class OfficialReportsLandingViewTest extends TestCase
         $this->assertStringNotContainsString('Save period details', $view);
     }
 
-    public function test_form_ten_uses_generated_invoice_numbers_and_keeps_optional_metadata_and_printing(): void
+    public function test_form_ten_uses_generated_invoice_numbers_and_keeps_optional_metadata_and_printing_without_pdf_button(): void
     {
         $view = file_get_contents(dirname(__DIR__, 2).'/resources/views/reports/official/form-ten.blade.php');
 
@@ -38,7 +38,7 @@ class OfficialReportsLandingViewTest extends TestCase
         $this->assertStringContainsString('id="bank-name"', $view);
         $this->assertStringContainsString('id="bank-branch"', $view);
         $this->assertStringContainsString('id="bank-routing-number"', $view);
-        $this->assertStringContainsString('Download PDF', $view);
+        $this->assertStringNotContainsString('Download PDF', $view);
         $this->assertStringContainsString('window.print()', $view);
     }
 }

@@ -84,7 +84,8 @@ class FormFourReportTest extends TestCase
             ->assertOk()
             ->assertSee('Official Form 4')
             ->assertSee('০১/০৯/২০২৬')
-            ->assertSee('Download PDF');
+            ->assertSee('window.print()', false)
+            ->assertDontSee('Download PDF');
 
         $pdf = $this->get(route('admin.reports.form-four.pdf', ['month' => '2026-09']))
             ->assertOk()

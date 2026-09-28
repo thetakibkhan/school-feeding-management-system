@@ -21,7 +21,6 @@
                 <input id="form-ten-month" name="month" type="month" value="{{ $form['month'] }}" required>
                 <button type="submit">Show</button>
                 <button type="button" onclick="window.print()">Print</button>
-                <a href="{{ route('admin.reports.form-ten.pdf', ['month' => $form['month']]) }}">Download PDF</a>
             </form>
         </header>
 

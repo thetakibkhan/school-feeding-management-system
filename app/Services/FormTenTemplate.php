@@ -32,12 +32,8 @@ class FormTenTemplate
         $paymentNote = $isAssessmentFixture
             ? 'assessment/demo fixture পরিমাণের ভিত্তিতে হিসাব করা '.$grandTotal.'/- টাকা; প্রকৃত সরবরাহ যাচাই না হওয়া পর্যন্ত এটি প্রকৃত পরিশোধযোগ্য বিল নয়।'
             : 'এমতাবস্থায়, উক্ত ঠিকাদারকে '.$month.' মাসের '.$quantity('bun').' প্যাকেট বনরুটি, '.$quantity('boiled_egg').' পিস সিদ্ধ ডিম ও '.$quantity('banana').' পিস কলা সরবরাহের '.$grandTotal.'/- টাকার বিল পরিশোধ করার সুপারিশ করা হলো।';
-        $billRequest = $isAssessmentFixture
-            ? 'ডেমো ফিক্সচার পরিমাণ প্রকৃত সরবরাহ হিসেবে ব্যবহার করার আগে যাচাই করতে হবে।'
-            : 'বর্ণিত '.$grandTotal.'/- টাকার বিল প্রদানের জন্য অনুরোধ করা হলো';
-        $attachmentNote = $isAssessmentFixture
-            ? 'ডেমো ফিক্সচার পরিমাণের সঙ্গে কোনো কাল্পনিক চালান যুক্ত করা হয়নি।'
-            : 'সংযুক্তি: এই বিল সম্পর্কিত '.$chalanCount.' টি চালানের মূল কপি।';
+        $billRequest = 'বর্ণিত '.$grandTotal.'/- টাকার বিল প্রদানের জন্য অনুরোধ করা হলো';
+        $attachmentNote = 'সংযুক্তি: এই বিল সম্পর্কিত '.$chalanCount.' টি চালানের মূল কপি।';
 
         $fields = [
             $this->field(208, 240, 180, 20, (string) ($period->invoice_number ?? ''), 18, false, 'left'),

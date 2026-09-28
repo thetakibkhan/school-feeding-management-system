@@ -79,13 +79,20 @@ class FormTenTemplateVisualTest extends TestCase
         $fixtureOverlays = (new FormTenTemplate)->overlays([
             ...$form,
             'fixture_school_count' => 1,
+            'chalan_count' => 0,
         ]);
         $fixtureNote = $this->fieldAt($fixtureOverlays, 120, 895);
         $this->assertStringContainsString('assessment/demo fixture', $fixtureNote['text']);
         $this->assertStringContainsString('delivered = demand', $fixtureNote['text']);
         $this->assertStringContainsString('মাঠকর্মীর প্রকৃত এন্ট্রি নয়', $fixtureNote['text']);
-        $fixtureAttachment = $this->fieldAt($fixtureOverlays, 120, 729);
-        $this->assertStringContainsString('কোনো কাল্পনিক চালান', $fixtureAttachment['text']);
+        $this->assertSame(
+            'বর্ণিত ৪৬২/- টাকার বিল প্রদানের জন্য অনুরোধ করা হলো',
+            $this->fieldAt($fixtureOverlays, 120, 703)['text'],
+        );
+        $this->assertSame(
+            'সংযুক্তি: এই বিল সম্পর্কিত ০ টি চালানের মূল কপি।',
+            $this->fieldAt($fixtureOverlays, 120, 729)['text'],
+        );
     }
 
     /** @param list<array{x: int, y: int, width: int, height: int, text: string, font_size: int, bold: bool, align: string, line_height: float, font_family: string}> $overlays

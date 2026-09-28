@@ -113,7 +113,7 @@ class FormSevenReportTest extends TestCase
             ->assertOk()
             ->assertSee('This report is generated from currently entered delivery records. Some scheduled deliveries have not yet been entered.')
             ->assertSee('Print')
-            ->assertSee('Download PDF');
+            ->assertDontSee('Download PDF');
 
         $this->actingAs($admin)
             ->get('/admin/reports/form-7/pdf?month=2026-09')

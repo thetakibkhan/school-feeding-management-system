@@ -7,6 +7,7 @@ use App\Models\Delivery;
 use App\Models\School;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class DeliveryPhotoModalTest extends TestCase
@@ -40,6 +41,25 @@ class DeliveryPhotoModalTest extends TestCase
             ->assertSee('<dialog', false)
             ->assertSee('data-photo-modal-image', false)
             ->assertDontSee('target="_blank"', false);
+    }
+
+    public function test_admin_can_view_staff_chalan_photo_but_field_staff_cannot_use_admin_photo_route(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('test-chalan.jpg', 'chalan image');
+
+        $creator = User::factory()->create(['role' => UserRole::FieldStaff]);
+        $delivery = $this->deliveryFor($creator);
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.deliveries.chalan', $delivery))
+            ->assertOk()
+            ->assertHeader('Cache-Control', 'private, no-store');
+
+        $this->actingAs($creator)
+            ->get(route('admin.deliveries.chalan', $delivery))
+            ->assertForbidden();
     }
 
     private function deliveryFor(User $creator): Delivery

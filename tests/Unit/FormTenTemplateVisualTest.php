@@ -82,9 +82,8 @@ class FormTenTemplateVisualTest extends TestCase
             'chalan_count' => 0,
         ]);
         $fixtureNote = $this->fieldAt($fixtureOverlays, 120, 895);
-        $this->assertStringContainsString('assessment/demo fixture', $fixtureNote['text']);
-        $this->assertStringContainsString('delivered = demand', $fixtureNote['text']);
-        $this->assertStringContainsString('মাঠকর্মীর প্রকৃত এন্ট্রি নয়', $fixtureNote['text']);
+        $this->assertStringContainsString('উপর্যুক্ত বিবরণ', $fixtureNote['text']);
+        $this->assertStringNotContainsString('assessment/demo', $fixtureNote['text']);
         $this->assertSame(
             'বর্ণিত ৪৬২/- টাকার বিল প্রদানের জন্য অনুরোধ করা হলো',
             $this->fieldAt($fixtureOverlays, 120, 703)['text'],

@@ -56,7 +56,7 @@
                     @endif
 
                     <p class="stock-info-note">Opening stock, received quantity, and distribution are read from existing records. Missing facts remain blank in the official report; generation is not blocked.</p>
-                    <a class="stock-info-preview" href="{{ route('admin.reports.stock.preview', ['form' => 13, 'month' => $month]) }}">Preview Form 13</a>
+                    <a class="stock-info-preview" href="{{ route('admin.reports.stock.preview', ['form' => 13, 'month' => $month]) }}">Open preview</a>
                 </div>
             </section>
         </section>

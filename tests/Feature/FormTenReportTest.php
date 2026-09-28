@@ -91,7 +91,7 @@ class FormTenReportTest extends TestCase
         $this->assertSame(120, $form['items']['boiled_egg']['delivered_quantity']);
         $this->assertSame(50, $form['items']['banana']['delivered_quantity']);
         $this->assertSame(0, $form['chalan_count']);
-        $this->assertStringContainsString('delivered = demand', implode(' ', $form['warnings']));
+        $this->assertStringContainsString('supplied September demand quantities are shown', implode(' ', $form['warnings']));
         $this->assertDatabaseCount('deliveries', 0);
         $this->assertNull($form['period']->invoice_date);
         $this->assertNull($form['period']->contract_number);
@@ -100,9 +100,9 @@ class FormTenReportTest extends TestCase
         $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
             ->get(route('admin.reports.form-ten', ['month' => '2026-09']))
             ->assertOk()
-            ->assertSee('assessment/demo fixture', false)
-            ->assertSee('delivered = demand', false)
-            ->assertSee('not Field Staff-entered transactions', false);
+            ->assertSee('Some report values need attention', false)
+            ->assertSee('the supplied September demand quantities are shown', false)
+            ->assertDontSee('assessment/demo', false);
     }
 
     public function test_seeded_september_assessment_fixtures_populate_form_ten_from_source_totals(): void

@@ -9,6 +9,9 @@
                     <th scope="colgroup" colspan="4">{{ $foodItem->name }}</th>
                 @endforeach
                 <th scope="col" rowspan="2">Entry status</th>
+                @if ($canViewChalanPhotos)
+                    <th scope="col" rowspan="2">Chalan photo</th>
+                @endif
             </tr>
             <tr>
                 @foreach ($report['foodItems'] as $foodItem)
@@ -37,9 +40,20 @@
                             <span class="daily-report__entry-state daily-report__entry-state--missing">No entry yet</span>
                         @endif
                     </td>
+                    @if ($canViewChalanPhotos)
+                        <td>
+                            @if ($row['delivery'] !== null && filled($row['delivery']->chalan_disk) && filled($row['delivery']->chalan_path))
+                                <a href="{{ route('admin.deliveries.chalan', $row['delivery']) }}" data-photo-open>View photo</a>
+                            @elseif ($row['has_delivery'])
+                                <span>Not attached</span>
+                            @else
+                                <span aria-label="No delivery entry">—</span>
+                            @endif
+                        </td>
+                    @endif
                 </tr>
             @empty
-                <tr><td class="daily-report__empty" colspan="{{ 4 + ($report['foodItems']->count() * 4) }}">No schools have a student count effective on this date.</td></tr>
+                <tr><td class="daily-report__empty" colspan="{{ 4 + ($report['foodItems']->count() * 4) + ($canViewChalanPhotos ? 1 : 0) }}">No schools have a student count effective on this date.</td></tr>
             @endforelse
         </tbody>
         @if ($report['rows'] !== [])
@@ -52,6 +66,9 @@
                         @endforeach
                     @endforeach
                     <td></td>
+                    @if ($canViewChalanPhotos)
+                        <td></td>
+                    @endif
                 </tr>
             </tfoot>
         @endif

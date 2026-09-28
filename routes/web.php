@@ -7,10 +7,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FieldStaff\DeliveryController;
 use App\Http\Controllers\FieldStaff\DeliveryPhotoController;
 use App\Http\Controllers\Reports\DailyDeliveryReportController;
-use App\Http\Controllers\Reports\FormSevenReportController;
-use App\Http\Controllers\Reports\FormSevenPdfController;
 use App\Http\Controllers\Reports\FormFourPdfController;
 use App\Http\Controllers\Reports\FormFourReportController;
+use App\Http\Controllers\Reports\FormSevenPdfController;
+use App\Http\Controllers\Reports\FormSevenReportController;
 use App\Http\Controllers\Reports\FormTenPdfController;
 use App\Http\Controllers\Reports\FormTenReportController;
 use App\Http\Controllers\Reports\OfficialReportController;
@@ -24,6 +24,10 @@ Route::get('/dashboard', DashboardController::class)
 Route::get('/admin', DashboardController::class)
     ->middleware(['auth', 'role:admin'])
     ->name('admin.dashboard');
+
+Route::get('/admin/deliveries/{delivery}/chalan', [DeliveryPhotoController::class, 'showForAdmin'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.deliveries.chalan');
 
 Route::middleware(['auth', 'role:admin,field_staff'])
     ->prefix('reports/daily-delivery')

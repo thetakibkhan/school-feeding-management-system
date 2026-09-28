@@ -134,11 +134,11 @@ class FormTenReportService
 
         if ($missingDeliveryCount > 0) {
             $warnings[] = $fixtureSchoolCount > 0
-                ? 'Some scheduled deliveries have not yet been entered; assessment/demo fixture deliveries are shown for schools without actual monthly delivery records.'
+                ? 'Some scheduled deliveries have not yet been entered; supplied September demand quantities are shown for schools without recorded delivery entries.'
                 : 'This report is generated from currently entered delivery records. Some scheduled deliveries have not yet been entered.';
         }
         if ($fixtureSchoolCount > 0) {
-            $warnings[] = 'September source-backed demand quantities are used as assessment/demo fixture deliveries under the assumption delivered = demand for '.$fixtureSchoolCount.' schools without actual monthly delivery records. They are not Field Staff-entered transactions and do not create chalan records; actual monthly delivery records take precedence.';
+            $warnings[] = 'Supplied September demand quantities are shown for '.$fixtureSchoolCount.' schools without recorded monthly delivery entries. Actual monthly delivery records take precedence; these quantities do not create chalan records.';
         }
         foreach ([
             'invoice_date' => 'Invoice date',

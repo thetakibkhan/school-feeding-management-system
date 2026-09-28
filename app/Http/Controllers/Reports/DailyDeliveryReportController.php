@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Reports;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DailyDeliveryReportRequest;
 use App\Models\FoodItem;
@@ -18,6 +19,7 @@ class DailyDeliveryReportController extends Controller
     ): View {
         return view('reports.daily-delivery.index', [
             'report' => $dailyReports->forDate($request->selectedDate()),
+            'canViewChalanPhotos' => $request->user()?->role === UserRole::Admin,
         ]);
     }
 

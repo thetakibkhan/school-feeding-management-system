@@ -25,13 +25,8 @@ class FormTenTemplate
         $schoolCount = FormSevenReportService::bengaliDigits((string) $form['school_count']);
         $grandTotal = $form['grand_total_formatted'];
         $grandTotalWords = (string) $form['grand_total_words'];
-        $isAssessmentFixture = $form['fixture_school_count'] > 0;
-        $quantitySourceNote = $isAssessmentFixture
-            ? 'সেপ্টেম্বরের assessment/demo fixture পরিমাণসমূহ সরবরাহকৃত চাহিদার পূর্ণ সরবরাহ ধরে (delivered = demand) দেখানো হয়েছে; এগুলো মাঠকর্মীর প্রকৃত এন্ট্রি নয়।'
-            : 'উপর্যুক্ত বিবরণ অনুযায়ী অত্র উপজেলার '.$schoolCount.' টি সরকারি প্রাথমিক বিদ্যালয়ে '.$month.' মাসের স্পেসিফিকেশন অনুযায়ী বনরুটি, সিদ্ধ ডিম ও কলা সরবরাহের '.$chalanCount.' টি চালানের কপি অত্র কার্যালয়ে সংরক্ষিত আছে। নিম্ন স্বাক্ষরকারী কর্তৃক স্বাক্ষরিত ফরম নম্বর ৭ ও ফরম নম্বর ১৩ এতদসঙ্গে প্রেরণ করা হলো।';
-        $paymentNote = $isAssessmentFixture
-            ? 'assessment/demo fixture পরিমাণের ভিত্তিতে হিসাব করা '.$grandTotal.'/- টাকা; প্রকৃত সরবরাহ যাচাই না হওয়া পর্যন্ত এটি প্রকৃত পরিশোধযোগ্য বিল নয়।'
-            : 'এমতাবস্থায়, উক্ত ঠিকাদারকে '.$month.' মাসের '.$quantity('bun').' প্যাকেট বনরুটি, '.$quantity('boiled_egg').' পিস সিদ্ধ ডিম ও '.$quantity('banana').' পিস কলা সরবরাহের '.$grandTotal.'/- টাকার বিল পরিশোধ করার সুপারিশ করা হলো।';
+        $quantitySourceNote = 'উপর্যুক্ত বিবরণ অনুযায়ী অত্র উপজেলার '.$schoolCount.' টি সরকারি প্রাথমিক বিদ্যালয়ে '.$month.' মাসের স্পেসিফিকেশন অনুযায়ী বনরুটি, সিদ্ধ ডিম ও কলা সরবরাহের '.$chalanCount.' টি চালানের কপি অত্র কার্যালয়ে সংরক্ষিত আছে। নিম্ন স্বাক্ষরকারী কর্তৃক স্বাক্ষরিত ফরম নম্বর ৭ ও ফরম নম্বর ১৩ এতদসঙ্গে প্রেরণ করা হলো।';
+        $paymentNote = 'এমতাবস্থায়, উক্ত ঠিকাদারকে '.$month.' মাসের '.$quantity('bun').' প্যাকেট বনরুটি, '.$quantity('boiled_egg').' পিস সিদ্ধ ডিম ও '.$quantity('banana').' পিস কলা সরবরাহের '.$grandTotal.'/- টাকার বিল পরিশোধ করার সুপারিশ করা হলো।';
         $billRequest = 'বর্ণিত '.$grandTotal.'/- টাকার বিল প্রদানের জন্য অনুরোধ করা হলো';
         $attachmentNote = 'সংযুক্তি: এই বিল সম্পর্কিত '.$chalanCount.' টি চালানের মূল কপি।';
 

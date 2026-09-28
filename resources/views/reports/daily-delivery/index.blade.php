@@ -52,6 +52,9 @@
                     @include('reports.daily-delivery._table', ['report' => $report])
                 @endif
             </section>
+            @if ($canViewChalanPhotos)
+                @include('field-staff.deliveries._photo-modal')
+            @endif
         </section>
     </x-dashboard-shell>
 </body>

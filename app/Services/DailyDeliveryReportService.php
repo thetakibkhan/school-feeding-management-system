@@ -27,8 +27,8 @@ class DailyDeliveryReportService
      *     date: string,
      *     status: 'working'|'off_day'|'not_set_up',
      *     foodItems: Collection<int, FoodItem>,
-     *     rows: list<array{school: School, has_delivery: bool, items: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}>,
-     *     shortfallRows: list<array{school: School, has_delivery: bool, items: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}>,
+     *     rows: list<array{school: School, delivery: ?Delivery, has_delivery: bool, items: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}>,
+     *     shortfallRows: list<array{school: School, delivery: ?Delivery, has_delivery: bool, items: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}>,
      *     totals: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>
      * }
      */
@@ -76,6 +76,7 @@ class DailyDeliveryReportService
 
             $row = [
                 'school' => $school,
+                'delivery' => $delivery,
                 'has_delivery' => $delivery !== null,
                 'items' => $itemResults,
             ];
@@ -99,10 +100,10 @@ class DailyDeliveryReportService
     }
 
     /** @param Collection<int, FoodItem> $foodItems
-     * @param  list<array{school: School, has_delivery: bool, items: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}>  $rows
-     * @param  list<array{school: School, has_delivery: bool, items: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}>  $shortfallRows
+     * @param  list<array{school: School, delivery: ?Delivery, has_delivery: bool, items: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}>  $rows
+     * @param  list<array{school: School, delivery: ?Delivery, has_delivery: bool, items: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}>  $shortfallRows
      * @param  array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>  $totals
-     * @return array{date: string, status: 'working'|'off_day'|'not_set_up', foodItems: Collection<int, FoodItem>, rows: list<array{school: School, has_delivery: bool, items: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}>, shortfallRows: list<array{school: School, has_delivery: bool, items: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}>, totals: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}
+     * @return array{date: string, status: 'working'|'off_day'|'not_set_up', foodItems: Collection<int, FoodItem>, rows: list<array{school: School, delivery: ?Delivery, has_delivery: bool, items: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}>, shortfallRows: list<array{school: School, delivery: ?Delivery, has_delivery: bool, items: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}>, totals: array<string, array{demand: int, delivered: int, shortfall: int, excess: int}>}
      */
     private function result(string $date, string $status, Collection $foodItems, array $rows, array $shortfallRows, array $totals): array
     {

@@ -91,6 +91,29 @@ class DailyDeliveryReportTest extends TestCase
         $this->assertStringContainsString('90,0,90,0', $content);
     }
 
+    public function test_admin_sees_chalan_photo_links_on_daily_report_and_field_staff_does_not(): void
+    {
+        $items = $this->foodItems();
+        $this->schedule(self::REPORT_DATE, [$items['bun']]);
+        $school = $this->school('AN-001', 100, '2026-10-01');
+        $delivery = $this->delivery($school, $this->fieldStaff(), 80, 0, 0);
+        $photoUrl = route('admin.deliveries.chalan', $delivery);
+
+        $this->actingAs($this->admin())
+            ->get('/reports/daily-delivery?date='.self::REPORT_DATE)
+            ->assertOk()
+            ->assertSee('Chalan photo')
+            ->assertSee($photoUrl, false)
+            ->assertSee('data-photo-modal', false);
+
+        $this->actingAs($this->fieldStaff())
+            ->get('/reports/daily-delivery?date='.self::REPORT_DATE)
+            ->assertOk()
+            ->assertDontSee('Chalan photo')
+            ->assertDontSee($photoUrl, false)
+            ->assertDontSee('data-photo-modal', false);
+    }
+
     public function test_dashboard_uses_today_and_field_staff_see_only_their_own_entries(): void
     {
         $this->travelTo(Carbon::parse(self::REPORT_DATE.' 10:00:00'));
